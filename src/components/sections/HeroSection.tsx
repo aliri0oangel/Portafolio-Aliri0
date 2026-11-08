@@ -84,8 +84,7 @@ export function HeroSection() {
               <ArrowRight aria-hidden className="h-4 w-4" />
             </a>
             <a
-              href={cvPath}
-              download
+              href="#"/* {cvPath}  y attribute->download*/
               className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border-strong px-5 py-2.5 text-sm font-semibold text-text-bright transition-colors hover:border-accent-cyan hover:text-accent-cyan-bright"
             >
               <Download aria-hidden className="h-4 w-4" />
