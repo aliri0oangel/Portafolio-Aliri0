@@ -56,14 +56,17 @@ const pillars = [
 export function AboutSection() {
   const pillarsRef = useRevealOnScroll<HTMLDivElement>();
 
+  // Espaciado estandarizado según la sección Proyectos:
+  // py-10 sm:py-14 para el contenedor de sección y mb-6 md:mb-8 para el encabezado.
+  // Esto garantiza consistencia visual y alineación geométrica idéntica en el scroll de la navbar.
   return (
-    <section id="sobre-mi" className="section-contain py-16 sm:py-20">
+    <section id="sobre-mi" className="section-contain py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="Sobre Mí"
           title="Ingeniería de software bien hecha."
           description="Combino la disciplina del backend con un ojo obsesivo por la experiencia de usuario. Mi trabajo vive en la intersección entre código mantenible, seguridad y velocidad percibida — el tipo de software que los equipos pueden hacer crecer sin miedo."
-          className="reveal"
+          className="reveal mb-6 md:mb-8"
         />
 
         <div

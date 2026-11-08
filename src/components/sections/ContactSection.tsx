@@ -68,10 +68,13 @@ export function ContactSection() {
     return () => clearTimeout(timeoutId);
   }, [status, resetStatus]);
 
+  // Espaciado estandarizado según la sección Proyectos:
+  // py-10 sm:py-14 para la sección contenedora, unificando el respiro superior
+  // en todas las resoluciones y evitando saltos visuales al navegar por pestañas.
   return (
     <section
       id="contacto"
-      className="section-contain py-12 pb-20 sm:py-16 sm:pb-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:items-center lg:py-0 lg:pb-20"
+      className="section-contain py-10 sm:py-14 lg:min-h-[calc(100svh-4rem)]"
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-12">

@@ -30,13 +30,16 @@ const CATEGORIES: SkillCategory[] = ["Frontend", "Backend", "Complementos"];
 export function SkillsSection() {
   const gridRef = useRevealOnScroll<HTMLDivElement>();
 
+  // Espaciado estandarizado según la sección Proyectos:
+  // py-10 sm:py-14 para el contenedor de sección y mb-6 md:mb-8 para el encabezado.
+  // Proporciona el mismo espaciado superior y la misma distancia del eyebrow a la barra de navegación.
   return (
-    <section id="habilidades" className="section-contain py-16 sm:py-20">
+    <section id="habilidades" className="section-contain py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="Arsenal tech"
           title="Herramientas y conocimientos técnicos"
-          className="reveal"
+          className="reveal mb-6 md:mb-8"
         />
 
         <div

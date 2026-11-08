@@ -366,3 +366,74 @@ test.describe("Motion: aterrizaje inicial con hash en todos los tabs (Ajuste 17)
     expect(result.inCenter).toBe(true);
   });
 });
+
+test.describe("Motion: consistencia de espaciado superior en navegación (1er y 2do clic)", () => {
+  const tabs = [
+    { label: "Sobre Mí", id: "sobre-mi" },
+    { label: "Habilidades", id: "habilidades" },
+    { label: "Proyectos", id: "proyectos" },
+    { label: "Contacto", id: "contacto" },
+  ];
+
+  for (const { label, id } of tabs) {
+    test(`sección ${label}: aterrizaje idéntico y con respiro adecuado en 1er y 2do clic`, async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page.waitForTimeout(300);
+
+      // Primer clic en la pestaña
+      await navigateViaUI(page, label);
+      await page.waitForTimeout(600);
+
+      const pos1 = await page.evaluate((targetId) => {
+        const section = document.getElementById(targetId);
+        const header = section?.querySelector("[data-nav-anchor]");
+        const topbar = document.querySelector("header.fixed");
+        const topbarBottom = topbar?.getBoundingClientRect().bottom ?? 64;
+        const headerTop = header?.getBoundingClientRect().top ?? 0;
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        return {
+          scrollY,
+          maxScroll,
+          isAtMaxScroll: maxScroll > 0 && scrollY >= maxScroll - 2,
+          distToTopbar: headerTop - topbarBottom,
+        };
+      }, id);
+
+      // Segundo clic consecutivo en la misma pestaña
+      await navigateViaUI(page, label);
+      await page.waitForTimeout(600);
+
+      const pos2 = await page.evaluate((targetId) => {
+        const section = document.getElementById(targetId);
+        const header = section?.querySelector("[data-nav-anchor]");
+        const topbar = document.querySelector("header.fixed");
+        const topbarBottom = topbar?.getBoundingClientRect().bottom ?? 64;
+        const headerTop = header?.getBoundingClientRect().top ?? 0;
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        return {
+          scrollY,
+          maxScroll,
+          isAtMaxScroll: maxScroll > 0 && scrollY >= maxScroll - 2,
+          distToTopbar: headerTop - topbarBottom,
+        };
+      }, id);
+
+      // 1. Estabilidad geométrica absoluta: delta entre 1er y 2do clic <= 1.5px
+      // (garantiza que el primer clic aterriza igual que el segundo — sin layout shift)
+      expect(Math.abs(pos1.scrollY - pos2.scrollY)).toBeLessThanOrEqual(1.5);
+      expect(Math.abs(pos1.distToTopbar - pos2.distToTopbar)).toBeLessThanOrEqual(1.5);
+
+      // 2. Respiro superior adecuado: el eyebrow nunca debe quedar pegado (< 15px) a la barra fija.
+      // Excepción documentada: en viewports muy pequeños (ej. 320×568) la ÚLTIMA sección puede
+      // quedar al tope del scroll del documento y el browser clampea la posición — el eyebrow
+      // aterriza más arriba, pero AMBOS clics son iguales (garantizado por la condición 1 arriba).
+      if (!pos1.isAtMaxScroll) {
+        expect(pos1.distToTopbar).toBeGreaterThan(15);
+      }
+    });
+  }
+});
