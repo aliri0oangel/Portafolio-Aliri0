@@ -1,0 +1,38 @@
+ ok, dentro de esta carpeta vas a crear un archivo llamado planificacion.md.
+
+En este archivo vamos a planificar toda la estructura y características necesarias para realizar un portafolio profesional para un full-stack developer. El portafolio debe contener las siguientes características y secciones:
+
+Secciones:
+-Header con nombre y  profesión (Desarrollador web Full-Stack).
+-Intro personal: Una presentación breve: quién eres, qué te motiva y qué tipo
+de proyectos te gusta construir.
+-Conocimientos técnicos: 
+Lenguajes, frameworks y herramientas : HTML,
+CSS, JavaScript, React, Next.js, WordPress ,Git, GitHub.
+-Proyectos: Esta seccion de momento incluirá un solo proyecto, sin embargo debe ser creada para n cantidad de proyectos que se irán adicionando proximamente.
+-Sección de contacto
+: Los medios de contacto: correo electrónico
+, GitHub, Instagram, Whatsapp (de momento esas, proximamente se adicionaran algunas otras). Además de un formulario de contacto.
+
+El proyecto debe ser desarrolado con el Framework NextJS, para el servidor debe usarse pnpm, no npm. 
+Adicionalmente, el diseño debe ser intuitivo, atractivo y fluido con animaciones sencillas. El diseño debe tener variante de oscuro y claro. No llevará base de datos debido a que será solo un portafolio informativo. Utiliza tailwind para los estilos, aplica TDD, aplica los principios SOLID, aplica las reglas clean code. Comenta el codigo a pesar de lo que diga clean code. Asegurate de probar el sistema en todas sus resoluciones, aplica los principios de observabilidad y telemetria en tiempo real, aplica OWASP Top 10. Ademas de esto, asegurate de utilizar practicar de rendimiento, SEO,  aplica rate limit.
+Evalua cualquier caracteristica faltante del software, tecnologia, asegurate de plasmar como debe ser la realizacion de todo, crea un plan por fases y tareas, ademas de esto. Propon cualquier cosa para mejorar el rendimiento y seguridad de este desarrollo.
+Es importante que no inicies el desarrollo, solo el archivo de planificacion.
+
+
+
+
+
+ok, aca van un par de modificaciones:
+- Casi todos los elementos tienen una animacion de subida como por ejemplo, los formularios login/rtegister/mi cuenta. Quitalas, incluyendo el borde remarcado al pasar el mouse por encima.
+- Actualmente en la pagina de login tenemos que el formulario evalua el nivel ded fortaleza de la contraseña cosa que es incoherente ya que no se está creando ninguna contraseña, solo se está accediendo a la página. En los campos donde se debe evaluar esa fortaleza es solo en el registrro y en la modificacion de la contraseña en la cuenta, los demas quitalos.
+-El navbar no debe desaparececr, debe estar fijo en la parte superior con un estilo como glassmorphin para una experiencia mas agradable.
+-Sin menú hamburguesa. Coloca las opciones en iconos redondos alineados a la derecha tal que: 
+"Logo"------------------------"icono de Catalogo","icono ded Favoritos","icono de modo claro/oscuro", "icono de Mi cuenta".
+Al estar en la resolucion pequeña, el boton de "mi cuenta" debe contener la opcion: -mi cuenta y -salir (o cerrar sesión).
+-Elimina toda anotacion que esté con dos barras por ejemplo: // portal-7 · catálogo interdimensional · enlace estable con la API, es redundante.  
+- Las imagenes al acceder a un personaje en específico aparecen incompletas en algunos casos quedando con espacio por deebajo, lo cual en realidad deberia completar la card sin ningun espacio vertical por debajo.
+
+
+
+

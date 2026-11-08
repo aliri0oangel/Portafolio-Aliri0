@@ -1,26 +1,565 @@
 @import "tailwindcss";
 
+/* Estrategia de tema por clase (.dark) controlada por next-themes. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   TOKENS SEMÁNTICOS — Modo Studio Light (accesible, WCAG AA+)
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #eef1f6;
+  --surface-1: #ffffff;
+  --surface-2: #e8edf4;
+  --border: #d3dce7;
+  --border-strong: #b6c2d1;
+  --text-bright: #0f172a;
+  --text-dim: #475569;
+  --text-faint: #64748b;
+  --accent-emerald: #047857;
+  --accent-emerald-bright: #059669;
+  --accent-cyan: #0369a1;
+  --accent-cyan-bright: #0284c7;
+  --accent-violet: #6d28d9;
+  --accent-violet-bright: #7c3aed;
+  --accent-amber: #b45309;
+  --accent-amber-bright: #d97706;
+  --btn-primary-bg: #6ee7b7;
+  --btn-primary-bg-hover: #34d399;
+  --btn-primary-fg: #065f46;
+  --glow-emerald: rgb(6 95 70 / 0.18);
+  --ambient-dot: rgb(15 23 42 / 0.1);
 }
 
+/* ============================================================
+   TOKENS SEMÁNTICOS — Modo Code Dark (predeterminado)
+   ============================================================ */
+.dark {
+  --bg: #080b10;
+  --surface-1: #0f141e;
+  --surface-2: #161d2b;
+  --border: #1e293b;
+  --border-strong: #334155;
+  --text-bright: #f8fafc;
+  --text-dim: #94a3b8;
+  --text-faint: #64748b;
+  --accent-emerald: #10b981;
+  --accent-emerald-bright: #22c55e;
+  --accent-cyan: #06b6d4;
+  --accent-cyan-bright: #38bdf8;
+  --accent-violet: #6366f1;
+  --accent-violet-bright: #8b5cf6;
+  --accent-amber: #f59e0b;
+  --accent-amber-bright: #f46c38;
+  --btn-primary-bg: #10b981;
+  --btn-primary-bg-hover: #22c55e;
+  --btn-primary-fg: #041008;
+  --glow-emerald: rgb(16 185 129 / 0.18);
+  --ambient-dot: rgb(148 163 184 / 0.14);
+}
+
+/* Expone los tokens como utilidades de color de Tailwind v4. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-bright: var(--text-bright);
+  --color-text-dim: var(--text-dim);
+  --color-text-faint: var(--text-faint);
+  --color-accent-emerald: var(--accent-emerald);
+  --color-accent-emerald-bright: var(--accent-emerald-bright);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-cyan-bright: var(--accent-cyan-bright);
+  --color-accent-violet: var(--accent-violet);
+  --color-accent-violet-bright: var(--accent-violet-bright);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-amber-bright: var(--accent-amber-bright);
+  --color-btn-primary: var(--btn-primary-bg);
+  --color-btn-primary-hover: var(--btn-primary-bg-hover);
+  --color-btn-primary-fg: var(--btn-primary-fg);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   BASE
+   ============================================================ */
+html {
+  /* scroll-behavior manejado por Lenis (smooth-scroll progresivo). */
+  /* Ancla las secciones por debajo de la barra fija (~72px). */
+  scroll-padding-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-bright);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--accent-emerald);
+  color: var(--bg);
+}
+
+/* ============================================================
+   UTILIDADES DE RENDIMIENTO (Omni-Device)
+   ============================================================ */
+
+/* Omite layout/paint de secciones fuera del primer pliegue. */
+.section-contain {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 42rem;
+}
+
+/* Aísla el paint de cada tarjeta Bento: un hover nunca reflowa la página. */
+.card-contain {
+  contain: layout style paint;
+}
+
+/* Gradido ambiental estático: fallback del canvas en Tier 3. */
+.ambient-gradient {
+  background-image:
+    radial-gradient(ellipse 60% 40% at 20% 0%, var(--glow-emerald), transparent),
+    radial-gradient(ellipse 50% 35% at 85% 15%, rgb(99 102 241 / 0.08), transparent);
+}
+
+/* Retícula sutil de fondo (identidad "CodeCraft UI"). */
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, var(--ambient-dot) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--ambient-dot) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
+}
+
+/* ============================================================
+   MOTION SYSTEM (Ajuste 8) — Reveal scroll-driven
+   Los elementos (.reveal) se revelan con scroll-driven animations
+   (animation-timeline: view()): sin JavaScript, sin observers.
+   Fallbacks:
+   - Sin soporte de animation-timeline: el estado oculto NUNCA se
+     aplica (toda la regla vive dentro de @supports) → contenido
+     siempre visible.
+   - prefers-reduced-motion: idéntico (regla dentro de no-preference).
+   Restricción: las cards del carrusel Embla quedan FUERA de este
+   sistema (viven en overflow-hidden; una timeline view() ahí
+   congelaría la animación y dejaría las cards ocultas).
+   ============================================================ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      /* Entra desde el borde del viewport hasta cubrir 25%:
+         el elemento queda visible al 25% de su entrada. */
+      animation-range: entry 0% cover 25%;
+    }
+  }
+}
+
+/* ============================================================
+   MOTION SYSTEM (Ajuste 8) — Tarjetas con @starting-style
+   Grid de tarjetas que aparecen al entrar en pantalla:
+   - `.reveal-card` arranca con display:none (oculto).
+   - El hook useRevealOnScroll (IntersectionObserver, once) añade
+     `.is-visible` al grid → display:flex + transición con stagger
+     por --i.
+   - @starting-style declara el estado inicial (opacity 0 +
+     translate) para que el navegador transicione desde ahí.
+   Notas de cascada:
+   - Tailwind v4 pone sus utilities en @layer utilities; estas
+     reglas van SIN capa → ganan siempre (display:none vence al
+     `flex` del propio card).
+   - La transición del reveal se acota a :not(:hover) para que el
+     hover del card (translate/escalas con su transition-all
+     propia) no herede el delay escalonado del reveal.
+   Fallbacks:
+   - Sin soporte de @starting-style: display cambia y la tarjeta
+     aparece SIN animación (degradación limpia, cero contenido
+     perdido).
+   - prefers-reduced-motion: tarjetas visibles sin transición.
+   ============================================================ */
+.reveal-card {
+  display: none;
+}
+
+.reveal-card-grid.is-visible .reveal-card {
+  display: flex;
+}
+
+.reveal-card-grid.is-visible .reveal-card:not(:hover) {
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i, 0) * 90ms),
+    translate 0.6s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i, 0) * 90ms);
+}
+
+@starting-style {
+  .reveal-card-grid.is-visible .reveal-card {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-card {
+    display: flex;
+  }
+
+  .reveal-card-grid.is-visible .reveal-card:not(:hover) {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   ESTELA DE BORDE (Iteración 7) — estilo "conic rotating border"
+   Rotación continua 360° del haz de color; el translate central
+   se incluye en el keyframe porque los keyframes sobrescriben
+   por completo la propiedad transform del elemento.
+   ============================================================ */
+@keyframes border-spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ============================================================
+   SALTO ÚNICO DE ICONOS DE SKILL (Iteración 7 · ajuste 1)
+   Un solo rebote suave al entrar el hover en el tile, luego
+   reposo. Usa la propiedad `translate` (Tailwind v4) para no
+   interferir con `transform` de otros elementos.
+   ============================================================ */
+@keyframes icon-hop {
+  0% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 0 -6px;
+  }
+  70% {
+    translate: 0 1px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+/* ============================================================
+   ROTACIONES ORBITALES CONTINUAS Y ESTELAS (60% / 216°)
+   ============================================================ */
+@keyframes orbit-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.orbit-rotator-cw {
+  animation: orbit-cw var(--orbit-duration, 20s) linear infinite;
+}
+
+.orbit-rotator-ccw {
+  animation: orbit-ccw var(--orbit-duration, 20s) linear infinite;
+}
+
+/* Pausa congelada durante la transición de tema */
+html.theme-transitioning .orbit-rotator-cw,
+html.theme-transitioning .orbit-rotator-ccw {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-rotator-cw,
+  .orbit-rotator-ccw {
+    animation: none;
+  }
+  .orbit-dot {
+    transition: none;
+  }
+}
+
+/* Anillo fino (~1.5px) recortado en el borde exterior del arco conic */
+.orbit-trail-mask {
+  border-radius: 50%;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #fff calc(100% - 1.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #fff calc(100% - 1.5px));
+}
+
+/* ============================================================
+   SISTEMA ORBITAL (Iteración 8 — estilo chiragchrg.netlify.app)
+   Gradiente conic alternado A/B con tokens propios (sin riel base).
+   FASE: arrancan en 0° (sin `from`) para que el punto (a las 12,
+   0°) marque exactamente la discontinuidad transparente→color:
+   el punto es la "cabeza" del arco y la cola queda detrás (igual
+   que la referencia, cuyo gradiente normal termina en primary).
+   - A (anillos 60/80%, punto esmeralda): hueco 0→90° tras el punto
+     (rotación cw), cola esmeralda→cian→transparente.
+   - B (anillos 70/90%, punto cian): empieza cian en 0° (cabeza),
+     hueco 270→360° delante del punto (rotación ccw).
+   El punto teardrop va rotado -45° (variante --alt a 140°) y en
+   hover (≥1024px) crece 1.8× con el centro hueco del fondo.
+   ============================================================ */
+.orbit-gradient-a {
+  background: conic-gradient(
+    transparent,
+    transparent,
+    var(--accent-emerald-bright),
+    var(--accent-cyan-bright),
+    var(--accent-emerald-bright)
+  );
+}
+
+.orbit-gradient-b {
+  background: conic-gradient(
+    var(--accent-cyan-bright),
+    var(--accent-cyan-bright),
+    var(--accent-emerald-bright),
+    transparent,
+    transparent
+  );
+}
+
+.orbit-dot {
+  position: absolute;
+  top: -0.2em;
+  left: 50%;
+  translate: -50% 0;
+  rotate: -45deg;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 0 50% 50%;
+  background-color: currentColor;
+  outline: 0.5px solid currentColor;
+  outline-offset: -0.5px;
+  box-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor;
+  transition:
+    scale 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.orbit-dot--alt {
+  rotate: 140deg;
+}
+
+/* Hover del sistema (solo ≥1024px): el punto crece y se vacía */
+@media (min-width: 1024px) {
+  .hero-orbit:hover .orbit-dot {
+    scale: 1.8;
+    background-color: var(--bg);
+  }
+}
+
+/* ============================================================
+   THEME TOGGLE — View Transition circular wipe (Estilo Chirag)
+   Barrido de 0.75s con curva suave y congelamiento de animaciones.
+
+   Ajuste 8: con soporte de tipos de VT (:active-view-transition-type)
+   el wipe queda RE-ESCOPEADO al tipo `theme` y el tipo `section-nav`
+   usa un crossfade suave. La regla legacy sin scoping se conserva
+   como fallback para navegadores sin tipos — seguro porque el JS
+   solo arranca VT de navegación donde hay soporte de tipos.
+   ============================================================ */
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
+/* Fallback legacy (sin tipos): wipe del tema en cualquier VT. */
+::view-transition-new(root) {
+  animation: theme-reveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 9999;
+}
+
+/* El overlay de VT captura los clics durante la animación; se
+   desactiva para que la navegación siga siendo interactiva
+   (recetario oficial de la guía de View Transitions de Next). */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root) {
+  animation: none;
+  z-index: 0;
+}
+
+/* Crossfade suave del root para la navegación de secciones (Ajuste 8).
+   Duración ~300ms: salto de scroll instantáneo dentro del update +
+   fundido corto entre los snapshots old/new. */
+@keyframes section-nav-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes section-nav-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Re-escopado por tipo de transición (Chromium 125+, Safari/FF
+   recientes). Mayor especificidad que las reglas legacy → ganan. */
+@supports selector(:active-view-transition-type(theme)) {
+  html:active-view-transition-type(theme) ::view-transition-new(root) {
+    animation: theme-reveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    z-index: 9999;
+  }
+
+  html:active-view-transition-type(theme) ::view-transition-old(root) {
+    animation: none;
+    z-index: 0;
+  }
+
+  html:active-view-transition-type(section-nav) ::view-transition-new(root) {
+    animation: section-nav-in 0.3s ease-out forwards;
+    z-index: 9999;
+  }
+
+  html:active-view-transition-type(section-nav) ::view-transition-old(root) {
+    animation: section-nav-out 0.3s ease-out forwards;
+    z-index: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* !important: anula también las reglas escopadas por tipo. */
+  ::view-transition-new(root),
+  ::view-transition-old(root) {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   AJUSTE 18 — SWITCH DE TEMA (knob deslizante tipo Lucide)
+   Track 44×24 (w-11 h-6) con knob 20×20 (w-5 h-5) a 2 px del
+   borde → recorrido de 20 px (translate-x-5).
+
+   ¿Por qué `animation` y no `transition`? `disableTransitionOnChange`
+   de next-themes inyecta `transition: none !important` en el árbol
+   ~1.3 ms después del clic (medido con sonda), lo que cancela
+   cualquier transición en curso; las @keyframes no se ven afectadas.
+
+   Las clases .theme-knob--to-* las agrega el componente recién tras
+   el primer clic, así que el primer pintado no reproduce animación
+   alguna: el knob aparece ya en su sitio (Ajuste 18).
+   ============================================================ */
+
+@keyframes theme-knob-slide-to-dark {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 20px 0;
+  }
+}
+
+@keyframes theme-knob-slide-to-light {
+  from {
+    translate: 20px 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+/* Cross-fade de los iconos del knob (sol ⇄ luna) con giro de -90° y
+   escala 0.4, misma curva y duración que el slide (referencia:
+   VPSwitchAppearance de lucide.dev). */
+@keyframes theme-knob-icon-in {
+  from {
+    opacity: 0;
+    rotate: -90deg;
+    scale: 0.4;
+  }
+  to {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 1;
+  }
+}
+
+@keyframes theme-knob-icon-out {
+  from {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    rotate: -90deg;
+    scale: 0.4;
+  }
+}
+
+/* Solo con movimiento permitido: bajo prefers-reduced-motion el knob
+   salta directo a su posición y los iconos cambian de golpe. */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-knob--to-dark {
+    animation: theme-knob-slide-to-dark 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .theme-knob--to-light {
+    animation: theme-knob-slide-to-light 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .theme-knob--to-dark .theme-knob__icon--sun {
+    animation: theme-knob-icon-out 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .theme-knob--to-dark .theme-knob__icon--moon {
+    animation: theme-knob-icon-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .theme-knob--to-light .theme-knob__icon--sun {
+    animation: theme-knob-icon-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .theme-knob--to-light .theme-knob__icon--moon {
+    animation: theme-knob-icon-out 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 }
