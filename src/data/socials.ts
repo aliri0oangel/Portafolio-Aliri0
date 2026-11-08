@@ -6,8 +6,8 @@
  */
 export const socials = {
   email: "alirioangel44@gmail.com",
-  github: "https://github.com/alirio",
-  linkedin: "https://www.linkedin.com/in/alirio",
+  github: "https://github.com/aliri0oangel",
+  linkedin: "https://www.linkedin.com",
   /** Formato E.164 sin signos: 58 + código de área + número. */
   whatsappNumber: "584123936025",
   whatsappPrefilledMessage:
