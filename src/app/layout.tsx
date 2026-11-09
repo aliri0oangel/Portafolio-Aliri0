@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "Alirio | Desarrollador Web Full-Stack & Ingeniero de Software",
+    default: "Alirio | Desarrollador Web Full-Stack",
     template: "%s | Alirio — Full-Stack Developer",
   },
   description:
