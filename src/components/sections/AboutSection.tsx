@@ -64,8 +64,8 @@ export function AboutSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="Sobre Mí"
-          title="Ingeniería de software bien hecha."
-          description="Combino la disciplina del backend con un ojo obsesivo por la experiencia de usuario. Mi trabajo vive en la intersección entre código mantenible, seguridad y velocidad percibida — el tipo de software que los equipos pueden hacer crecer sin miedo."
+          title="Obsesión por el detalle, rigor en el código."
+          description="Diseño sistemas escalables desde la arquitectura hasta los detalles de la interfaz. Apuesto por código limpio, backend robusto y cero fricción para el usuario final, permitiendo que el producto evolucione con seguridad."
           className="reveal mb-6 md:mb-8"
         />
 
