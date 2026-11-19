@@ -114,10 +114,28 @@ body {
    UTILIDADES DE RENDIMIENTO (Omni-Device)
    ============================================================ */
 
-/* Omite layout/paint de secciones fuera del primer pliegue. */
+/* Omite layout/paint de secciones fuera del primer pliegue.
+   Fase 1: contain-intrinsic-size sincronizado con SECTION_FULL_HEIGHT
+   (min-h + py por breakpoint). El intrinsic es la medida del contenido
+   (box-sizing: border-box suma el padding encima), así que se estima
+   `min-h − 2×py` para que (estimado + 2×py) = altura real mínima y el
+   scrollbar no salta al primer reveal. `auto` recuerda el tamaño real
+   tras el primer render (el contenido puede superar el min-h). */
 .section-contain {
   content-visibility: auto;
-  contain-intrinsic-size: auto 42rem;
+  contain-intrinsic-size: auto calc(100svh - 10rem); /* py-20: 2×5rem */
+}
+
+@media (min-width: 640px) {
+  .section-contain {
+    contain-intrinsic-size: auto calc(100svh - 12rem); /* sm:py-24: 2×6rem */
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-contain {
+    contain-intrinsic-size: auto calc(100svh - 14rem); /* lg:py-28: 2×7rem */
+  }
 }
 
 /* Aísla el paint de cada tarjeta Bento: un hover nunca reflowa la página. */

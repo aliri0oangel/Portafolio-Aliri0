@@ -27,7 +27,7 @@ export function Input({ label, error, className, id, ...props }: InputProps) {
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={inputId}
-        className="text-sm font-medium text-text-dim"
+        className="text-sm font-medium text-text-dim 2xl:text-[0.9375rem]"
       >
         {label}
       </label>
@@ -38,6 +38,7 @@ export function Input({ label, error, className, id, ...props }: InputProps) {
         className={cn(
           "min-h-11 w-full rounded-lg border bg-surface-1 px-3.5 py-2.5 text-sm text-text-bright",
           "placeholder:text-text-faint transition-colors",
+          "2xl:min-h-12 2xl:py-3 2xl:text-base",
           "focus:outline-2 focus:outline-offset-2 focus:outline-accent-emerald",
           error ? "border-accent-amber-bright" : "border-border hover:border-border-strong",
           className,

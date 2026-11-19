@@ -36,6 +36,7 @@ export function Toast({ visible, message, tone = "success" }: ToastProps) {
           className={cn(
             "pointer-events-none fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2",
             "rounded-lg border border-border-strong bg-surface-2 px-4 py-3 text-sm text-text-bright shadow-xl",
+            "2xl:bottom-8 2xl:px-5 2xl:py-4 2xl:text-base",
           )}
         >
           {tone === "success" ? (

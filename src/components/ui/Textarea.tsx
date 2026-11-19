@@ -40,14 +40,17 @@ export function Textarea({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between">
-        <label htmlFor={textareaId} className="text-sm font-medium text-text-dim">
+        <label
+          htmlFor={textareaId}
+          className="text-sm font-medium text-text-dim 2xl:text-[0.9375rem]"
+        >
           {label}
         </label>
         {typeof currentLength === "number" && typeof maxLength === "number" ? (
           <span
             aria-hidden
             className={cn(
-              "font-mono text-xs",
+              "font-mono text-xs 2xl:text-sm",
               currentLength > maxLength ? "text-accent-amber-bright" : "text-text-faint",
             )}
           >
@@ -63,6 +66,7 @@ export function Textarea({
         className={cn(
           "min-h-32 w-full resize-y rounded-lg border bg-surface-1 px-3.5 py-2.5 text-sm text-text-bright",
           "placeholder:text-text-faint transition-colors",
+          "2xl:min-h-40 2xl:py-3 2xl:text-base",
           "focus:outline-2 focus:outline-offset-2 focus:outline-accent-emerald",
           error ? "border-accent-amber-bright" : "border-border hover:border-border-strong",
           className,

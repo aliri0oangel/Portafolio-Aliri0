@@ -18,7 +18,7 @@ describe("Encabezados de secciones", () => {
     render(<AboutSection />);
     expect(screen.getByText("Sobre Mí")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Ingeniería de software bien hecha." }),
+      screen.getByRole("heading", { level: 2, name: "Obsesión por el detalle, rigor en el código." }),
     ).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("Encabezados de secciones", () => {
 
   it("About/Contact conservan su párrafo descriptivo", () => {
     render(<AboutSection />);
-    expect(screen.getByText(/Combino la disciplina del backend/)).toBeInTheDocument();
+    expect(screen.getByText(/Diseño sistemas escalables desde la arquitectura/)).toBeInTheDocument();
     render(<ContactSection />);
     expect(screen.getByText(/Elige el canal que prefieras/)).toBeInTheDocument();
   });

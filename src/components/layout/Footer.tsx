@@ -26,10 +26,10 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-surface-1/60">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-evenly lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-evenly lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px] 2xl:py-12">
         <div className="flex flex-col gap-1">
           {/* <span className="text-sm font-semibold text-text-bright">alirio.dev</span> */}
-          <span className="text-xs text-text-faint">
+          <span className="text-xs text-text-faint 2xl:text-sm">
             {year !== 0 ? `© ${year} ` : "© "} Alirio Hernández • Venezuela (UTC-4).
           </span>
         </div>

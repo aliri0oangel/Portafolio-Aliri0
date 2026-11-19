@@ -59,7 +59,7 @@ export function Topbar() {
             : "border-border bg-bg",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
           {/* Identidad de marca con micro-LED esmeralda */}
           <a
             href="#inicio"
@@ -67,7 +67,7 @@ export function Topbar() {
               event.preventDefault();
               handleNavigate("inicio");
             }}
-            className="flex items-center gap-2 text-sm font-semibold text-text-bright"
+            className="flex items-center gap-2 text-sm font-semibold text-text-bright 2xl:text-base"
           >
             <span className="relative flex h-2 w-2" aria-hidden>
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-emerald opacity-60" />
@@ -91,7 +91,7 @@ export function Topbar() {
                         handleNavigate(link.id);
                       }}
                       className={cn(
-                        "relative flex items-center gap-1.5 rounded-md px-3 py-2 text-sm transition-colors",
+                        "relative flex items-center gap-1.5 rounded-md px-3 py-2 text-sm transition-colors 2xl:px-4 2xl:text-base",
                         isActive ? "text-text-bright" : "text-text-dim hover:text-text-bright",
                       )}
                     >

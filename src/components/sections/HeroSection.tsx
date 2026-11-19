@@ -36,21 +36,25 @@ export function HeroSection() {
     },
   };
 
+  // Fase 1: min-h-[100svh] (antes calc(100svh-4rem)) — el Hero
+  // cubre la pantalla visible completa desde el tope (el topbar
+  // flota sobre él; pt-20 despeja la barra) y la sección siguiente
+  // no asoma al cargar la página.
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[calc(100svh-4rem)] items-center pt-20 pb-10 sm:pt-24 sm:pb-12 lg:pt-20 lg:pb-12"
+      className="relative flex min-h-[100svh] items-center pt-20 pb-10 sm:pt-24 sm:pb-12 lg:pt-20 lg:pb-12"
     >
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-10 xl:gap-14 lg:px-8">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-10 xl:gap-14 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
         {/* Columna 1: Declaración tipográfica de impacto calibrada al viewport */}
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex flex-col items-start gap-4 sm:gap-5 lg:gap-6"
+          className="flex flex-col items-start gap-4 sm:gap-5 lg:gap-6 2xl:gap-7"
         >
           <motion.div variants={item}>
-            <h1 className="flex flex-col font-mono text-3xl font-extrabold tracking-tight leading-[1.12] sm:text-4xl md:text-5xl lg:text-[2.6rem] xl:text-[3.2rem]">
+            <h1 className="flex flex-col font-mono text-3xl font-extrabold tracking-tight leading-[1.12] sm:text-4xl md:text-5xl lg:text-[2.6rem] xl:text-[3.2rem] 2xl:text-[3.75rem]">
               <span className="text-text-bright">Código limpio.</span>
               <span className="text-accent-emerald-bright drop-shadow-[0_0_24px_var(--glow-emerald)]">
                 Experiencias fluidas.
@@ -61,7 +65,7 @@ export function HeroSection() {
 
           <motion.p
             variants={item}
-            className="max-w-lg text-pretty text-sm leading-relaxed text-text-dim sm:text-base"
+            className="max-w-lg text-pretty text-sm leading-relaxed text-text-dim sm:text-base xl:max-w-xl 2xl:text-lg"
           >
             Desarrollador web Full-Stack enfocado en construir productos web de
             alto rendimiento, escalables y optimizados para el crecimiento de tu
@@ -78,14 +82,14 @@ export function HeroSection() {
                 event.preventDefault();
                 navigateToSection("proyectos");
               }}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-btn-primary px-5 py-2.5 text-sm font-semibold text-btn-primary-fg shadow-[0_0_24px_var(--glow-emerald)] transition-all hover:-translate-y-0.5 hover:bg-btn-primary-hover"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-btn-primary px-5 py-2.5 text-sm font-semibold text-btn-primary-fg shadow-[0_0_24px_var(--glow-emerald)] transition-all hover:-translate-y-0.5 hover:bg-btn-primary-hover 2xl:min-h-12 2xl:px-6 2xl:py-3 2xl:text-base"
             >
               Explorar Proyectos
               <ArrowRight aria-hidden className="h-4 w-4" />
             </a>
             <a
               href="#"/* {cvPath}  y attribute->download*/
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border-strong px-5 py-2.5 text-sm font-semibold text-text-bright transition-colors hover:border-accent-cyan hover:text-accent-cyan-bright"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border-strong px-5 py-2.5 text-sm font-semibold text-text-bright transition-colors hover:border-accent-cyan hover:text-accent-cyan-bright 2xl:min-h-12 2xl:px-6 2xl:py-3 2xl:text-base"
             >
               <Download aria-hidden className="h-4 w-4" />
               Descargar CV

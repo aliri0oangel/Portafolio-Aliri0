@@ -70,14 +70,16 @@ describe("HeroOrbit", () => {
 
   /* ==================== Proporciones (Fase 1) ==================== */
 
-  it("el contenedor adopta el tamaño de la referencia (340 → 500px)", () => {
+  it("el contenedor adopta el tamaño de la referencia (340 → 680px)", () => {
     render(<HeroOrbit />);
     const container = screen.getByTestId("hero-orbit");
     expect(container.className).toContain("max-w-[340px]");
     expect(container.className).toContain("lg:max-w-[500px]");
+    expect(container.className).toContain("xl:max-w-[600px]");
+    expect(container.className).toContain("2xl:max-w-[680px]");
   });
 
-  it("el avatar adopta el tamaño de la referencia (180 → 250px)", () => {
+  it("el avatar adopta el tamaño de la referencia (180 → 320px)", () => {
     render(<HeroOrbit />);
     const coreButton = screen.getByRole("button", {
       name: /Avatar de Alirio — haz click para interactuar/i,
@@ -85,6 +87,8 @@ describe("HeroOrbit", () => {
     expect(coreButton.className).toContain("w-[180px]");
     expect(coreButton.className).toContain("md:w-[220px]");
     expect(coreButton.className).toContain("lg:w-[250px]");
+    expect(coreButton.className).toContain("xl:w-[280px]");
+    expect(coreButton.className).toContain("2xl:w-[320px]");
   });
 
   it("renderiza 4 anillos con las proporciones 90/80/70/60% (exterior → interior)", () => {

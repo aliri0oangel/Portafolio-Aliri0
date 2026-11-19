@@ -1,5 +1,3 @@
-import { escapeHtmlEntities } from "@/lib/sanitize";
-
 /**
  * Adaptador desacoplado de despacho de correo (Dependency Inversion).
  *
@@ -32,7 +30,11 @@ export interface IEmailProvider {
 
 /**
  * Implementación de desarrollo: simula el envío con latencia mínima y
- * registra el mensaje en consola del servidor. No requiere API keys.
+ * registra **solo metadatos operativos** en consola del servidor.
+ * No requiere API keys.
+ *
+ * A01/A05 (PII): email, nombre y cuerpo del mensaje NUNCA se
+ * loguean — solo id, subjectLength y messageLength para debug.
  *
  * PLACEHOLDER: cuando exista `RESEND_API_KEY`, implementar `ResendEmailProvider`
  * cumpliendo `IEmailProvider` y seleccionarlo en `createEmailProvider`.
@@ -44,13 +46,11 @@ export class MockEmailProvider implements IEmailProvider {
     await new Promise((resolve) => setTimeout(resolve, 200));
 
     const id = `mock_${Date.now().toString(36)}`;
+    // Sin PII: solo longitudes e id para correlación.
     console.info("[email:mock] Mensaje de contacto recibido", {
       id,
-      from: payload.email,
-      name: escapeHtmlEntities(payload.name),
-      subject: payload.subject,
-      // Nunca registrar el cuerpo completo en producción con datos reales.
-      preview: escapeHtmlEntities(payload.message).slice(0, 120),
+      subjectLength: payload.subject.length,
+      messageLength: payload.message.length,
     });
 
     return { success: true, id };

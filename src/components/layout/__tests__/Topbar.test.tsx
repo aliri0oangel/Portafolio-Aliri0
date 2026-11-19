@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Topbar } from "../Topbar";
+import { navLinks } from "@/data/site";
 
 /**
  * Fija `window.scrollY` y dispara el evento scroll para alimentar
@@ -141,5 +142,35 @@ describe("Topbar — navegación por secciones", () => {
     });
 
     window.matchMedia = original;
+  });
+});
+
+/**
+ * Escalado de resoluciones grandes (xl ≥1280 / 2xl ≥1536): SOLO el
+ * contenido del Topbar escala (marca y links de nav). La altura h-16 de
+ * la barra queda CONGELADA: todo el sistema de anclas (scroll-padding
+ * 88px) y los e2e de aterrizaje dependen de ella (decisión de diseño).
+ */
+describe("Topbar — Escala en resoluciones grandes (xl/2xl)", () => {
+  it("la marca escala 2xl:text-base sobre base text-sm y la barra conserva h-16", () => {
+    const { container } = render(<Topbar />);
+    const marca = screen.getByRole("link", { name: "alirio.dev" });
+    expect(marca.className).toContain("text-sm");
+    expect(marca.className).toContain("2xl:text-base");
+
+    const barra = container.querySelector("header .h-16")!;
+    expect(barra.className).toContain("h-16");
+    expect(barra.className).not.toContain("2xl:h-");
+  });
+
+  it("los enlaces de nav escalan 2xl:text-base 2xl:px-4 sobre base text-sm px-3", () => {
+    render(<Topbar />);
+    for (const link of navLinks) {
+      const anchor = screen.getByRole("link", { name: link.label });
+      expect(anchor.className).toContain("text-sm");
+      expect(anchor.className).toContain("px-3");
+      expect(anchor.className).toContain("2xl:text-base");
+      expect(anchor.className).toContain("2xl:px-4");
+    }
   });
 });

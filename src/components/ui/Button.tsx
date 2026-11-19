@@ -40,6 +40,7 @@ export function Button({ variant = "primary", className, children, ...props }: B
     <button
       className={cn(
         "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold",
+        "2xl:min-h-12 2xl:px-6 2xl:py-3 2xl:text-base",
         "transition-all duration-200 ease-out",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald",
         "disabled:pointer-events-none disabled:opacity-60",

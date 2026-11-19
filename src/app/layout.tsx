@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { WebVitals } from "@/components/providers/WebVitals";
 import { siteUrl } from "@/data/site";
 import "./globals.css";
 
@@ -96,6 +97,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <ThemeProvider>
           <SmoothScroll />
+          {/* RUM liviano: reporta Core Web Vitals a /api/telemetry */}
+          <WebVitals />
           {children}
         </ThemeProvider>
       </body>

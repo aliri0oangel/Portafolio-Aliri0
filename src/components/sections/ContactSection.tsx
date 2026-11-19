@@ -20,6 +20,7 @@ import { Toast } from "@/components/ui/Toast";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { LocalClock } from "@/components/sections/LocalClock";
 import { useRevealOnScroll } from "@/hooks/useRevealOnScroll";
+import { SECTION_FULL_HEIGHT } from "./sectionClassNames";
 
 /**
  * Sección de contacto — Ajuste 7: rediseño de 2 columnas inspirado en
@@ -68,23 +69,22 @@ export function ContactSection() {
     return () => clearTimeout(timeoutId);
   }, [status, resetStatus]);
 
-  // Espaciado estandarizado según la sección Proyectos:
-  // py-10 sm:py-14 para la sección contenedora, unificando el respiro superior
-  // en todas las resoluciones y evitando saltos visuales al navegar por pestañas.
+  // Sección a pantalla completa (Fase 1 — patrón herasi.dev):
+  // SECTION_FULL_HEIGHT = flex flex-col + min-h-[100svh] + bumps sm/lg
+  // + py de referencia (top-align, sin centrado). Fase 2: contenedor
+  // flex-1 + grilla flex-1 estiran el bloque a la altura disponible.
+  // Antes solo era lg:min-h-[calc(100svh-4rem)]. Ver sectionClassNames.ts.
   return (
-    <section
-      id="contacto"
-      className="section-contain py-10 sm:py-14 lg:min-h-[calc(100svh-4rem)]"
-    >
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-12">
+    <section id="contacto" className={SECTION_FULL_HEIGHT}>
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 sm:px-6 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
+        <div className="grid flex-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-12 2xl:gap-16">
           {/* ========================================================
                COL 1 (izquierda): Encabezado + reloj pill + enlaces
                directos (Ajuste 15) — 5 cols
                ======================================================== */}
           <div
             data-testid="contact-intro"
-            className="flex flex-col gap-6 lg:col-span-5"
+            className="flex flex-col gap-6 lg:col-span-5 2xl:gap-7"
           >
             <SectionHeader
               eyebrow="Contacto"
@@ -105,7 +105,7 @@ export function ContactSection() {
             <div className="border-t border-border/50 pt-4">
               <span
                 aria-hidden
-                className="mb-3 block font-mono text-[10px] font-semibold tracking-widest uppercase text-text-faint"
+                className="mb-3 block font-mono text-[10px] font-semibold tracking-widest uppercase text-text-faint 2xl:text-xs"
               >
                 Enlaces directos
               </span>
@@ -129,24 +129,24 @@ export function ContactSection() {
                   rel="noopener noreferrer"
                   data-testid="contact-card-whatsapp"
                   aria-label="Contactar por WhatsApp"
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0 2xl:px-5 2xl:py-4"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-accent-emerald/30 bg-accent-emerald/15 text-accent-emerald">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg 2xl:h-9 2xl:w-9 border border-accent-emerald/30 bg-accent-emerald/15 text-accent-emerald">
                       <MessageCircle aria-hidden className="h-4 w-4" />
                     </span>
                     <span className="flex flex-col">
-                      <span className="text-xs font-semibold text-text-bright">
+                      <span className="text-xs font-semibold text-text-bright 2xl:text-sm">
                         WhatsApp
                       </span>
-                      <span className="text-[11px] text-text-dim">
+                      <span className="text-[11px] text-text-dim 2xl:text-xs">
                         Chat directo
                       </span>
                     </span>
                   </span>
                   <ArrowUpRight
                     aria-hidden
-                    className="h-4 w-4 shrink-0 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-emerald-bright"
+                    className="h-4 w-4 shrink-0 2xl:h-5 2xl:w-5 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-emerald-bright"
                   />
                 </a>
 
@@ -157,24 +157,24 @@ export function ContactSection() {
                   rel="noopener noreferrer"
                   data-testid="contact-card-github"
                   aria-label="Perfil de GitHub"
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0 2xl:px-5 2xl:py-4"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2 text-text-dim">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg 2xl:h-9 2xl:w-9 border border-border bg-surface-2 text-text-dim">
                       <GithubIcon className="h-4 w-4" />
                     </span>
                     <span className="flex flex-col">
-                      <span className="text-xs font-semibold text-text-bright">
+                      <span className="text-xs font-semibold text-text-bright 2xl:text-sm">
                         GitHub
                       </span>
-                      <span className="font-mono text-[11px] text-text-dim">
+                      <span className="font-mono text-[11px] text-text-dim 2xl:text-xs">
                         Repositorios
                       </span>
                     </span>
                   </span>
                   <ArrowUpRight
                     aria-hidden
-                    className="h-4 w-4 shrink-0 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-cyan-bright"
+                    className="h-4 w-4 shrink-0 2xl:h-5 2xl:w-5 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-cyan-bright"
                   />
                 </a>
 
@@ -186,19 +186,19 @@ export function ContactSection() {
                     para que el texto no tenga que recortarse). */}
                 <div
                   data-testid="contact-card-email"
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)]"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] 2xl:px-5 2xl:py-4"
                 >
                   {/* min-w-0 permite que el grupo izquierdo ceda espacio a los botones
                       en viewports de ~180px de card (lg, Ajuste 17) */}
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-accent-emerald/30 bg-accent-emerald/15 text-accent-emerald">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg 2xl:h-9 2xl:w-9 border border-accent-emerald/30 bg-accent-emerald/15 text-accent-emerald">
                       <Mail aria-hidden className="h-4 w-4" />
                     </span>
                     <span className="flex min-w-0 flex-col">
-                      <span className="text-xs font-semibold text-text-bright">
+                      <span className="text-xs font-semibold text-text-bright 2xl:text-sm">
                         Email
                       </span>
-                      <span className="truncate font-mono text-[11px] text-text-dim">
+                      <span className="truncate font-mono text-[11px] text-text-dim 2xl:text-xs">
                         Contacto
                       </span>
                     </span>
@@ -208,25 +208,25 @@ export function ContactSection() {
                       type="button"
                       onClick={() => copy(socials.email)}
                       aria-label="Copiar correo al portapapeles"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-text-dim transition-colors hover:border-accent-emerald hover:text-accent-emerald-bright"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-text-dim transition-colors hover:border-accent-emerald hover:text-accent-emerald-bright 2xl:h-9 2xl:w-9"
                     >
                       {copied ? (
                         <Check
                           aria-hidden
-                          className="h-3.5 w-3.5 text-accent-emerald-bright"
+                          className="h-3.5 w-3.5 2xl:h-4 2xl:w-4 text-accent-emerald-bright"
                         />
                       ) : (
-                        <Copy aria-hidden className="h-3.5 w-3.5" />
+                        <Copy aria-hidden className="h-3.5 w-3.5 2xl:h-4 2xl:w-4" />
                       )}
                     </button>
                     <a
                       href={`mailto:${socials.email}`}
                       aria-label="Abrir correo en el cliente de email"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-text-dim transition-colors hover:border-accent-emerald hover:text-accent-emerald-bright"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-text-dim transition-colors hover:border-accent-emerald hover:text-accent-emerald-bright 2xl:h-9 2xl:w-9"
                     >
                       <ArrowUpRight
                         aria-hidden
-                        className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        className="h-3.5 w-3.5 2xl:h-4 2xl:w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                       />
                     </a>
                   </span>
@@ -239,24 +239,24 @@ export function ContactSection() {
                   rel="noopener noreferrer"
                   data-testid="contact-card-linkedin"
                   aria-label="Perfil de LinkedIn"
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-surface-1/40 px-4 py-3 backdrop-blur-md transition-all duration-300 hover:border-accent-emerald-bright/50 hover:bg-surface-1/65 hover:shadow-[0_0_24px_var(--glow-emerald)] motion-reduce:hover:translate-y-0 2xl:px-5 2xl:py-4"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2 text-text-dim">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg 2xl:h-9 2xl:w-9 border border-border bg-surface-2 text-text-dim">
                       <LinkedinIcon className="h-4 w-4" />
                     </span>
                     <span className="flex flex-col">
-                      <span className="text-xs font-semibold text-text-bright">
+                      <span className="text-xs font-semibold text-text-bright 2xl:text-sm">
                         LinkedIn
                       </span>
-                      <span className="font-mono text-[11px] text-text-dim">
+                      <span className="font-mono text-[11px] text-text-dim 2xl:text-xs">
                         Conectar
                       </span>
                     </span>
                   </span>
                   <ArrowUpRight
                     aria-hidden
-                    className="h-4 w-4 shrink-0 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-cyan-bright"
+                    className="h-4 w-4 shrink-0 2xl:h-5 2xl:w-5 text-text-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-cyan-bright"
                   />
                 </a>
               </div>
@@ -273,15 +273,15 @@ export function ContactSection() {
             className="reveal-card-grid lg:col-span-7"
           >
             <div
-              className="reveal-card flex-col rounded-3xl border border-border-strong/60 bg-surface-1/50 p-5 backdrop-blur-xl shadow-[0_0_50px_-10px_var(--glow-emerald)] sm:p-7"
+              className="reveal-card flex-col rounded-3xl border border-border-strong/60 bg-surface-1/50 p-5 backdrop-blur-xl shadow-[0_0_50px_-10px_var(--glow-emerald)] sm:p-7 2xl:p-9 2xl:shadow-[0_0_64px_-10px_var(--glow-emerald)]"
               style={{ "--i": 0 } as React.CSSProperties}
             >
               {/* Micro-encabezado interior */}
               <div className="mb-4 flex items-center gap-2 border-b border-border/50 pb-2.5">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-accent-emerald/20 text-accent-emerald-bright shadow-[0_0_12px_var(--glow-emerald)]">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-accent-emerald/20 text-accent-emerald-bright shadow-[0_0_12px_var(--glow-emerald)] 2xl:h-6 2xl:w-6">
                   <Send aria-hidden className="h-3 w-3" />
                 </span>
-                <span className="font-mono text-[11px] font-semibold tracking-wider uppercase text-text-dim">
+                <span className="font-mono text-[11px] font-semibold tracking-wider uppercase text-text-dim 2xl:text-xs">
                   Envíame un mensaje
                 </span>
               </div>
@@ -365,8 +365,8 @@ export function ContactSection() {
                       role="status"
                       className={
                         status === "success"
-                          ? "text-center text-xs text-accent-emerald-bright"
-                          : "text-center text-xs text-accent-amber-bright"
+                          ? "text-center text-xs text-accent-emerald-bright 2xl:text-sm"
+                          : "text-center text-xs text-accent-amber-bright 2xl:text-sm"
                       }
                     >
                       {serverMessage}

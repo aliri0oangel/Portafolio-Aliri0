@@ -400,3 +400,88 @@ describe("ProjectsSection — Alternativa 1: Cinematic Bento Stage (Loop Infinit
     expect(screen.queryByText("Shader Melt")).not.toBeInTheDocument();
   });
 });
+
+/**
+ * Escalado de resoluciones grandes (xl ≥1280 / 2xl ≥1536): HUD, footer
+ * card, título, Ver demo, flechas y badges escalan con variantes 2xl:.
+ * El tope `max-w-2xl` (672px) de la footer card queda CONGELADO: el e2e
+ * de projects valida `≤672px` en todos los viewports.
+ */
+describe("ProjectsSection — Escala en resoluciones grandes (xl/2xl)", () => {
+  it("el contador del HUD escala 2xl:px-4 2xl:py-2 2xl:text-sm sobre base px-3.5 py-1.5", () => {
+    render(<ProjectsSection />);
+    const contador = screen.getByText(/PROYECTO 01 \/ 05/).parentElement!;
+    expect(contador.className).toContain("px-3.5");
+    expect(contador.className).toContain("py-1.5");
+    expect(contador.className).toContain("2xl:px-4");
+    expect(contador.className).toContain("2xl:py-2");
+    expect(contador.className).toContain("2xl:text-sm");
+  });
+
+  it("la footer card escala 2xl:px-6 2xl:py-3.5 y conserva max-w-2xl (≤672px)", () => {
+    render(<ProjectsSection />);
+    const card = document.querySelector('[aria-live="polite"]')!;
+    expect(card.className).toContain("sm:px-5");
+    expect(card.className).toContain("sm:py-3");
+    expect(card.className).toContain("2xl:px-6");
+    expect(card.className).toContain("2xl:py-3.5");
+    expect(card.className).toContain("max-w-2xl");
+    expect(card.className).not.toContain("max-w-3xl");
+  });
+
+  it("el título del proyecto activo escala 2xl:text-[1.75rem] sobre base sm:text-2xl", () => {
+    render(<ProjectsSection />);
+    const h3 = screen.getByRole("heading", {
+      level: 3,
+      name: projects[0].title,
+    });
+    expect(h3.className).toContain("sm:text-2xl");
+    expect(h3.className).toContain("2xl:text-[1.75rem]");
+  });
+
+  it("el botón 'Ver demo' escala 2xl:text-base 2xl:px-5 (base intacta)", () => {
+    render(<ProjectsSection />);
+    const demo = screen.getByRole("link", { name: /ver demo/i });
+    expect(demo.className).toContain("sm:text-sm");
+    expect(demo.className).toContain("sm:px-4");
+    expect(demo.className).toContain("2xl:text-base");
+    expect(demo.className).toContain("2xl:px-5");
+  });
+
+  it("las flechas escalan 2xl:h-14 2xl:w-14 con chevron 2xl:h-6 (left-3/right-3 intactos)", () => {
+    render(<ProjectsSection />);
+    const prev = screen.getByRole("button", { name: "Proyecto anterior" });
+    const next = screen.getByRole("button", { name: "Proyecto siguiente" });
+
+    expect(prev.className).toContain("left-3");
+    expect(next.className).toContain("right-3");
+    for (const arrow of [prev, next]) {
+      expect(arrow.className).toContain("sm:h-12 sm:w-12");
+      expect(arrow.className).toContain("2xl:h-14 2xl:w-14");
+      const chevron = arrow.querySelector("svg")!;
+      expect(chevron.getAttribute("class")).toContain("h-5 w-5");
+      expect(chevron.getAttribute("class")).toContain("2xl:h-6");
+    }
+  });
+
+  it("los puntos de navegación quedan sin escalar (geometría congelada por e2e)", () => {
+    render(<ProjectsSection />);
+    const dot = screen.getByRole("button", {
+      name: `Ir al proyecto 1: ${projects[0].title}`,
+    });
+    expect(dot.className).toContain("h-6 w-6");
+    expect(dot.className).not.toContain("2xl:");
+  });
+
+  it("los TechBadge escalan 2xl:text-[13px] 2xl:px-2.5 sobre base text-xs px-2", () => {
+    render(<ProjectsSection />);
+    const badges = document.querySelectorAll('[aria-live="polite"] ul li > span');
+    expect(badges.length).toBeGreaterThan(0);
+    for (const badge of badges) {
+      expect(badge.className).toContain("text-xs");
+      expect(badge.className).toContain("px-2");
+      expect(badge.className).toContain("2xl:text-[13px]");
+      expect(badge.className).toContain("2xl:px-2.5");
+    }
+  });
+});

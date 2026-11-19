@@ -37,14 +37,14 @@ export function SectionHeader({
       data-nav-anchor
       className={cn("mb-10 flex flex-col items-start gap-2 md:mb-14", className)}
     >
-      <span className="inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent-emerald before:h-px before:w-8 before:bg-current before:content-['']">
+      <span className="inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent-emerald before:h-px before:w-8 before:bg-current before:content-[''] 2xl:text-sm">
         {eyebrow}
       </span>
-      <h2 className="text-3xl font-bold tracking-tight text-text-bright sm:text-4xl">
+      <h2 className="text-3xl font-bold tracking-tight text-text-bright sm:text-4xl xl:text-[2.75rem] 2xl:text-[3.25rem]">
         {title}
       </h2>
       {description ? (
-        <p className="mt-2 max-w-2xl text-base leading-relaxed text-text-dim">
+        <p className="mt-2 max-w-2xl text-base leading-relaxed text-text-dim xl:max-w-3xl 2xl:max-w-4xl 2xl:text-lg">
           {description}
         </p>
       ) : null}

@@ -95,13 +95,15 @@ export function LocalClock({ variant = "default" }: LocalClockProps) {
 
   if (variant === "pill") {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-surface-1/60 px-3.5 py-1.5 backdrop-blur-md shadow-sm">
-        <Globe aria-hidden className="h-3.5 w-3.5 shrink-0 text-accent-emerald" />
-        <span className="text-xs font-medium text-text-dim">Venezuela</span>
+      <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-surface-1/60 px-3.5 py-1.5 backdrop-blur-md shadow-sm 2xl:px-4 2xl:py-2">
+        <Globe aria-hidden className="h-3.5 w-3.5 shrink-0 text-accent-emerald 2xl:h-4 2xl:w-4" />
+        <span className="text-xs font-medium text-text-dim 2xl:text-sm">
+          Venezuela
+        </span>
         <span aria-hidden className="text-text-faint">
           ·
         </span>
-        <span className="font-mono text-xs tabular-nums text-text-bright">
+        <span className="font-mono text-xs tabular-nums text-text-bright 2xl:text-sm">
           {timeZoneLabel} • {time}
         </span>
       </div>

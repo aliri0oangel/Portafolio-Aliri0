@@ -5,6 +5,7 @@ import type { SkillCategory } from "@/types/skill";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useRevealOnScroll } from "@/hooks/useRevealOnScroll";
 import { SkillGroupCard } from "./skills/SkillGroupCard";
+import { SECTION_FULL_HEIGHT } from "./sectionClassNames";
 
 /**
  * Orden fijo de las 3 categorías en la grilla de habilidades.
@@ -30,12 +31,13 @@ const CATEGORIES: SkillCategory[] = ["Frontend", "Backend", "Complementos"];
 export function SkillsSection() {
   const gridRef = useRevealOnScroll<HTMLDivElement>();
 
-  // Espaciado estandarizado según la sección Proyectos:
-  // py-10 sm:py-14 para el contenedor de sección y mb-6 md:mb-8 para el encabezado.
-  // Proporciona el mismo espaciado superior y la misma distancia del eyebrow a la barra de navegación.
+  // Sección a pantalla completa (Fase 1 — patrón herasi.dev):
+  // SECTION_FULL_HEIGHT = flex flex-col + min-h-[100svh] + bumps sm/lg
+  // + py de referencia (top-align, sin centrado). Fase 2: contenedor
+  // flex-1, grilla auto-rows-fr, wrappers h-full. Ver sectionClassNames.ts.
   return (
-    <section id="habilidades" className="section-contain py-10 sm:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="habilidades" className={SECTION_FULL_HEIGHT}>
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 sm:px-6 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
         <SectionHeader
           eyebrow="Arsenal tech"
           title="Herramientas y conocimientos técnicos"
@@ -44,7 +46,7 @@ export function SkillsSection() {
 
         <div
           ref={gridRef}
-          className="reveal-card-grid grid grid-cols-1 gap-6 md:grid-cols-3"
+          className="reveal-card-grid grid auto-rows-fr flex-1 grid-cols-1 gap-6 md:grid-cols-3 xl:gap-8"
         >
           {CATEGORIES.map((category, index) => (
             <div

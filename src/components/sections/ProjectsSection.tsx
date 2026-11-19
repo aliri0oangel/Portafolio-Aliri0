@@ -1,13 +1,38 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { projects } from "@/data/projects";
 import { cn } from "@/lib/utils";
 import { TechBadge } from "@/components/ui/TechBadge";
 import { TechIcon } from "@/components/ui/TechIcon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { WebGLMorphCanvas } from "@/components/ui/WebGLMorphCanvas";
+import { SECTION_FULL_HEIGHT_NO_CONTAIN } from "./sectionClassNames";
+
+/**
+ * Fase 5 (rendimiento): el shader WebGL (melt + aberración) se carga
+ * con `next/dynamic` fuera del bundle inicial del home. El escenario
+ * conserva su aspect-ratio mientras el chunk llega (sin layout shift).
+ */
+const WebGLMorphCanvas = dynamic(
+  () =>
+    import("@/components/ui/WebGLMorphCanvas").then(
+      (m) => m.WebGLMorphCanvas,
+    ),
+  {
+    ssr: false,
+    // Placeholder con las mismas dimensiones que el canvas final:
+    // el stage ya define el aspect-ratio, así que basta `h-full`.
+    loading: () => (
+      <div
+        data-testid="webgl-morph-loading"
+        className="w-full h-full bg-surface-2"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 /** Intervalo para el avance automático en milisegundos (4 s). */
 const AUTOPLAY_DELAY_MS = 4000;
@@ -93,8 +118,14 @@ export function ProjectsSection() {
   };
 
   return (
-    <section id="proyectos" className="section-contain py-10 sm:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    // Sección a pantalla completa (Fase 1 — patrón herasi.dev):
+    // min-h-[100svh] + bumps sm/lg + py de referencia (top-align, sin
+    // centrado). Sin content-visibility: el stage 16/9 supera el min-h
+    // en viewports anchos y el reveal causaría layout shift (+81px en
+    // 1920×1080). Fase 2: contenedor flex-1 (el stage conserva su
+    // aspect-ratio; no se fuerza auto-rows-fr). Ver sectionClassNames.ts.
+    <section id="proyectos" className={SECTION_FULL_HEIGHT_NO_CONTAIN}>
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 sm:px-6 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
         <SectionHeader
           eyebrow="Proyectos"
           title="Casos de estudio seleccionados."
@@ -102,11 +133,13 @@ export function ProjectsSection() {
         />
 
         {hasProjects ? (
-          // Ajuste 13: el stage se acota a max-w-5xl (1024px) y se centra
-          // para dejar de verse estirado; los handlers de pausa viven aquí
-          // para que la zona de hover coincida exactamente con la foto.
+          // Ajuste 13: el stage se acota a max-w-5xl (1024px); en xl/2xl
+          // crece hasta 80/96rem pero nunca más ancho que 16/9 del alto
+          // disponible (100svh − 14rem), de modo que el max-h no distorsione
+          // la proporción. Los handlers de pausa viven aquí para que la
+          // zona de hover coincida exactamente con la foto.
           <div
-            className="relative mx-auto w-full max-w-5xl"
+            className="relative mx-auto w-full max-w-5xl xl:max-w-[min(80rem,calc((100svh_-_14rem)*16_/_9))] 2xl:max-w-[min(96rem,calc((100svh_-_14rem)*16_/_9))]"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
@@ -122,7 +155,7 @@ export function ProjectsSection() {
                 // nunca corte el footer en pantallas cortas; en pantallas
                 // ≥ ~750px de alto el min() devuelve el valor actual y
                 // nada cambia.
-                "min-h-[min(380px,calc(100svh_-_14rem))] sm:min-h-[min(460px,calc(100svh_-_14rem))] md:min-h-[min(520px,calc(100svh_-_14rem))] max-h-[min(620px,calc(100svh_-_14rem))]",
+                "min-h-[min(380px,calc(100svh_-_14rem))] sm:min-h-[min(460px,calc(100svh_-_14rem))] md:min-h-[min(520px,calc(100svh_-_14rem))] max-h-[min(620px,calc(100svh_-_14rem))] xl:max-h-[min(720px,calc(100svh_-_14rem))] 2xl:max-h-[min(864px,calc(100svh_-_14rem))]",
                 "overflow-hidden rounded-2xl border border-border bg-surface-1 shadow-2xl select-none outline-none",
                 "focus-visible:ring-2 focus-visible:ring-accent-emerald",
               )}
@@ -150,7 +183,7 @@ export function ProjectsSection() {
 
               {/* HUD Superior: Contador de proyectos */}
               <div className="pointer-events-none absolute top-4 left-4 right-4 z-20 flex items-center justify-between sm:top-5 sm:left-6 sm:right-6">
-                <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-surface-1/85 px-3.5 py-1.5 font-mono text-xs text-text-bright backdrop-blur-md shadow-lg">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-surface-1/85 px-3.5 py-1.5 font-mono text-xs text-text-bright backdrop-blur-md shadow-lg 2xl:px-4 2xl:py-2 2xl:text-sm">
                   <span className="h-2 w-2 rounded-full bg-accent-emerald-bright animate-pulse" />
                   <span>
                     PROYECTO {String(selectedIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
@@ -169,12 +202,12 @@ export function ProjectsSection() {
                     aria-live vive en la card (la región viva es el
                     contenido visible que cambia con cada proyecto). */}
                 <div
-                  className="pointer-events-auto mx-auto max-w-2xl rounded-2xl border border-border/80 bg-surface-1/90 px-4 py-2.5 backdrop-blur-md shadow-2xl transition-all sm:px-5 sm:py-3"
+                  className="pointer-events-auto mx-auto max-w-2xl rounded-2xl border border-border/80 bg-surface-1/90 px-4 py-2.5 backdrop-blur-md shadow-2xl transition-all sm:px-5 sm:py-3 2xl:px-6 2xl:py-3.5"
                   aria-live="polite"
                 >
                   {/* Fila 1: título a la izquierda, Ver demo a la derecha */}
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="min-w-0 text-lg sm:text-2xl font-bold text-text-bright leading-tight tracking-tight">
+                    <h3 className="min-w-0 text-lg sm:text-2xl font-bold text-text-bright leading-tight tracking-tight 2xl:text-[1.75rem]">
                       {activeProject.title}
                     </h3>
 
@@ -185,7 +218,7 @@ export function ProjectsSection() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cn(
-                          "inline-flex shrink-0 items-center gap-2 rounded-xl bg-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-btn-primary-fg shadow-lg",
+                          "inline-flex shrink-0 items-center gap-2 rounded-xl bg-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm font-semibold text-btn-primary-fg shadow-lg 2xl:px-5 2xl:text-base",
                           "transition-transform hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald",
                         )}
                       >
@@ -248,17 +281,17 @@ export function ProjectsSection() {
                 type="button"
                 aria-label="Proyecto anterior"
                 onClick={handlePrev}
-                className="pointer-events-auto absolute left-3 top-1/2 z-30 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-surface-1/90 text-text-bright backdrop-blur-md shadow-xl transition-all hover:scale-105 hover:border-border-strong active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald cursor-pointer sm:left-5 sm:h-12 sm:w-12"
+                className="pointer-events-auto absolute left-3 top-1/2 z-30 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-surface-1/90 text-text-bright backdrop-blur-md shadow-xl transition-all hover:scale-105 hover:border-border-strong active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald cursor-pointer sm:left-5 sm:h-12 sm:w-12 2xl:h-14 2xl:w-14"
               >
-                <ChevronLeft aria-hidden className="h-5 w-5" />
+                <ChevronLeft aria-hidden className="h-5 w-5 2xl:h-6 2xl:w-6" />
               </button>
               <button
                 type="button"
                 aria-label="Proyecto siguiente"
                 onClick={handleNext}
-                className="pointer-events-auto absolute right-3 top-1/2 z-30 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-surface-1/90 text-text-bright backdrop-blur-md shadow-xl transition-all hover:scale-105 hover:border-border-strong active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald cursor-pointer sm:right-5 sm:h-12 sm:w-12"
+                className="pointer-events-auto absolute right-3 top-1/2 z-30 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-surface-1/90 text-text-bright backdrop-blur-md shadow-xl transition-all hover:scale-105 hover:border-border-strong active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald cursor-pointer sm:right-5 sm:h-12 sm:w-12 2xl:h-14 2xl:w-14"
               >
-                <ChevronRight aria-hidden className="h-5 w-5" />
+                <ChevronRight aria-hidden className="h-5 w-5 2xl:h-6 2xl:w-6" />
               </button>
             </div>
           </div>

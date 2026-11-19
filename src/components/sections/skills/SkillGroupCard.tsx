@@ -61,20 +61,20 @@ export function SkillGroupCard({ category, skills }: SkillGroupCardProps) {
         style={BEAM_STYLE}
       />
       {/* Panel interior opaco: tapa el centro del gradiente */}
-      <div className="relative h-full rounded-[22px] border border-border bg-surface-1 p-8 transition-colors duration-500 group-hover:border-accent-emerald/40">
+      <div className="relative h-full rounded-[22px] border border-border bg-surface-1 p-8 transition-colors duration-500 group-hover:border-accent-emerald/40 2xl:p-10">
         {/* Glow decorativo: aparece solo al hover de la tarjeta */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-accent-emerald opacity-0 blur-[60px] transition-opacity duration-700 group-hover:opacity-20"
+          className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-accent-emerald opacity-0 blur-[60px] transition-opacity duration-700 group-hover:opacity-20 2xl:h-56 2xl:w-56"
         />
         <div className="relative z-10">
-          <h3 className="mb-8 flex items-center gap-3 text-2xl font-bold text-text-bright">
-            <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-surface-2 text-accent-emerald shadow-lg">
-              <Icon aria-hidden className="h-6 w-6" />
+          <h3 className="mb-8 flex items-center gap-3 text-2xl font-bold text-text-bright 2xl:text-3xl">
+            <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-surface-2 text-accent-emerald shadow-lg xl:h-14 xl:w-14 2xl:h-16 2xl:w-16">
+              <Icon aria-hidden className="h-6 w-6 2xl:h-7 2xl:w-7" />
             </span>
             {skillCategoryLabels[category]}
           </h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 xl:gap-5 2xl:gap-6">
             {groupSkills.map((skill) => (
               <SkillTile key={skill.id} skill={skill} />
             ))}

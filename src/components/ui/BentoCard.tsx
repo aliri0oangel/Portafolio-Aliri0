@@ -15,7 +15,7 @@ export function BentoCard({ className, children, ...props }: ComponentProps<"div
   return (
     <div
       className={cn(
-        "card-contain rounded-xl border border-border bg-surface-1 p-6",
+        "card-contain rounded-xl border border-border bg-surface-1 p-6 xl:p-7 2xl:p-8",
         // Elevación sutil solo en modo claro: en oscuro el contraste lo da el borde.
         "shadow-[0_1px_2px_rgb(15_23_42/0.04),0_4px_16px_rgb(15_23_42/0.05)] dark:shadow-none",
         "transition-colors duration-200 hover:border-border-strong",

@@ -43,7 +43,7 @@ export function SkillTile({ skill }: SkillTileProps) {
       title={isLearning ? "En proceso — ver docs" : `Docs de ${skill.name}`}
       className="group/icon flex cursor-pointer flex-col items-center gap-2 rounded-xl text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-emerald"
     >
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface-2 p-2.5 transition duration-300 group-hover/icon:border-accent-emerald/40 group-hover/icon:bg-surface-1 group-hover:scale-105 motion-reduce:group-hover:scale-100 sm:h-14 sm:w-14 sm:p-3">
+      <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface-2 p-2.5 transition duration-300 group-hover/icon:border-accent-emerald/40 group-hover/icon:bg-surface-1 group-hover:scale-105 motion-reduce:group-hover:scale-100 sm:h-14 sm:w-14 sm:p-3 xl:h-16 xl:w-16 xl:p-3.5 2xl:h-20 2xl:w-20 2xl:p-4">
         {/* SVGs locales de 0.1-9KB con width/height explícitos (cero CLS).
           next/image aporta poca ganancia en SVGs pequeños auto-hospedados
           y añade el loader de imágenes a la cadena. */}
@@ -67,7 +67,7 @@ export function SkillTile({ skill }: SkillTileProps) {
           </span>
         ) : null}
       </div>
-      <span className="text-[10px] font-medium leading-tight text-text-faint transition-colors duration-300 group-hover/icon:text-text-bright">
+      <span className="text-[10px] font-medium leading-tight text-text-faint transition-colors duration-300 group-hover/icon:text-text-bright xl:text-[11px] 2xl:text-xs">
         {skill.name}
       </span>
     </a>

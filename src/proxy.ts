@@ -10,6 +10,8 @@ import { NextResponse, type NextRequest } from "next/server";
  * - **A05 (Security Misconfiguration):** headers estrictos en toda respuesta.
  * - **A01 (Broken Access Control):** solo GET/POST/OPTIONS permitidos en /api/*.
  * - **A06 (Vulnerable Components):** HSTS fuerza HTTPS en navegadores compatibles.
+ * - **Observabilidad:** `x-request-id` por petición para correlacionar
+ *   logs de proxy → rutas API → error boundaries (Fase 3).
  */
 
 /** Métodos HTTP permitidos para rutas de API. */
@@ -45,11 +47,21 @@ const SECURITY_HEADERS: Record<string, string> = {
 /**
  * Proxy Next.js: se ejecuta antes de cada request.
  *
- * 1. Aplica headers de seguridad a todas las respuestas.
- * 2. Bloquea métodos no permitidos en rutas /api/* (405).
+ * 1. Asigna/reutiliza `x-request-id` para correlación de observabilidad.
+ * 2. Aplica headers de seguridad a todas las respuestas.
+ * 3. Bloquea métodos no permitidos en rutas /api/* (405).
  */
 export function proxy(request: NextRequest) {
   const response = NextResponse.next();
+
+  // 0. Request-id de correlación (observabilidad Fase 3):
+  //    reutiliza el entrante si existe; si no, genera uno nuevo.
+  const incomingId = request.headers.get("x-request-id");
+  const requestId =
+    incomingId && incomingId.length <= 128
+      ? incomingId
+      : crypto.randomUUID();
+  response.headers.set("x-request-id", requestId);
 
   // 1. Headers de seguridad en toda respuesta
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
@@ -62,7 +74,13 @@ export function proxy(request: NextRequest) {
     if (!ALLOWED_API_METHODS.has(method)) {
       return NextResponse.json(
         { ok: false, message: `Método ${method} no permitido.` },
-        { status: 405, headers: { Allow: "GET, POST, OPTIONS" } },
+        {
+          status: 405,
+          headers: {
+            Allow: "GET, POST, OPTIONS",
+            "x-request-id": requestId,
+          },
+        },
       );
     }
   }

@@ -121,3 +121,31 @@ describe("LocalClock — contrato de useSyncExternalStore (Ajuste 6)", () => {
     expect(screen.getByText("Zona horaria local")).toBeInTheDocument();
   });
 });
+
+/**
+ * Escalado de resoluciones grandes (xl ≥1280 / 2xl ≥1536): la variante
+ * "pill" (usada en ContactSection) escala con variantes 2xl: sin tocar
+ * la base px-3.5 py-1.5 / text-xs.
+ */
+describe("LocalClock — Escala en resoluciones grandes (xl/2xl)", () => {
+  it("la pill escala 2xl:px-4 2xl:py-2 2xl:text-sm y el globo 2xl:h-4", () => {
+    const { container } = render(<LocalClock variant="pill" />);
+    const pill = container.querySelector(".rounded-full")!;
+    expect(pill.className).toContain("px-3.5");
+    expect(pill.className).toContain("py-1.5");
+    expect(pill.className).toContain("2xl:px-4");
+    expect(pill.className).toContain("2xl:py-2");
+
+    const globo = pill.querySelector("svg")!;
+    expect(globo.getAttribute("class")).toContain("h-3.5 w-3.5");
+    expect(globo.getAttribute("class")).toContain("2xl:h-4");
+
+    const etiqueta = screen.getByText("Venezuela");
+    expect(etiqueta.className).toContain("text-xs");
+    expect(etiqueta.className).toContain("2xl:text-sm");
+
+    const hora = container.querySelector(".tabular-nums")!;
+    expect(hora.className).toContain("text-xs");
+    expect(hora.className).toContain("2xl:text-sm");
+  });
+});

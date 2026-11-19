@@ -26,11 +26,18 @@ export default defineConfig({
     { name: "laptop-1024", use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } } },
     { name: "desktop-1280", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
     { name: "desktop-1920", use: { ...devices["Desktop Chrome"], viewport: { width: 1920, height: 1080 } } },
+    { name: "desktop-2560", use: { ...devices["Desktop Chrome"], viewport: { width: 2560, height: 1440 } } },
   ],
   webServer: {
     command: "pnpm build && pnpm start --port 3100",
     url: "http://localhost:3100",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // RUM desactivado en e2e: evita 429 de /api/telemetry y errores
+    // de consola falsos en el test "sin errores de consola" (motion).
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_TELEMETRY_ENABLED: "false",
+    },
   },
 });

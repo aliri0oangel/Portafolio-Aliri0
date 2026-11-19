@@ -85,12 +85,40 @@ export function revealTargetCards(section: HTMLElement | null): void {
 }
 
 /**
+ * Revela las tarjetas de la sección y aterriza en su ancla
+ * (`data-nav-anchor` → fallback: el `<section>`), alineada a 88px
+ * por `scroll-padding-top: 5.5rem` (Ajuste 8).
+ *
+ * Compartido por `navigateToSection` (nav) y `useInitialHash`
+ * (carga directa con `#hash`) para que ambos caminos de aterrizaje
+ * se comporten igual.
+ *
+ * El aterrizaje es SIEMPRE al ancla (sin alternativas según la
+ * altura de la sección): así el scroll solo depende de la posición
+ * del ancla — estable entre clics aunque `content-visibility: auto`
+ * cambie la altura estimada→real de las secciones (Fase 1: el
+ * "sin asomo" se garantiza con el alto de `SECTION_FULL_HEIGHT`,
+ * no con un ajuste de aterrizaje).
+ *
+ * @param section - Sección destino (con layout medido).
+ * @param behavior - Comportamiento del scroll (`"auto"` | `"smooth"`).
+ */
+export function scrollSectionIntoView(
+  section: HTMLElement,
+  behavior: ScrollBehavior,
+): void {
+  revealTargetCards(section);
+  const anchor =
+    section.querySelector<HTMLElement>("[data-nav-anchor]") ?? section;
+  anchor.scrollIntoView({ behavior, block: "start" });
+}
+
+/**
  * Desplaza la página a la sección destino (o al tope para "inicio")
  * con el comportamiento indicado y sincroniza el hash.
  *
- * El ancla de aterrizaje es el `data-nav-anchor` del `SectionHeader`
- * (fallback: el `<section>`); sin sección destino solo se actualiza
- * el hash. Antes de medir se revelan las tarjetas del destino
+ * El aterrizaje vive en {@link scrollSectionIntoView} (ancla a
+ * 88px). Antes de medir se revelan las tarjetas del destino
  * (ver {@link revealTargetCards}).
  *
  * @param id - Id de la sección destino ("inicio" = tope de página).
@@ -103,10 +131,7 @@ function applyScrollAndHash(id: string, behavior: ScrollBehavior): void {
     window.scrollTo({ top: 0, behavior });
   } else {
     const section = document.getElementById(id);
-    revealTargetCards(section);
-    const anchor =
-      section?.querySelector<HTMLElement>("[data-nav-anchor]") ?? section;
-    anchor?.scrollIntoView({ behavior, block: "start" });
+    if (section) scrollSectionIntoView(section, behavior);
   }
   window.history.replaceState(null, "", `#${id}`);
 }

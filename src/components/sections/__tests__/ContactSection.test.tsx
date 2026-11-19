@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ContactSection } from "../ContactSection";
 import { triggerReveal } from "@/__tests__/revealTrigger";
 
@@ -29,6 +30,35 @@ describe("ContactSection", () => {
         name: "Hablemos de tu próximo proyecto.",
       }),
     ).toBeInTheDocument();
+  });
+
+  // Fase 1 (TDD): la sección llena la pantalla visible en TODOS los
+  // breakpoints (antes solo lg:min-h-[calc(100svh-4rem)]) — patrón
+  // herasi.dev. Sin centrado: el aterrizaje por ancla exige top-align.
+  // Ver sectionClassNames.ts.
+  it("llena el viewport: min-h-[100svh] + bumps sm/lg + py de referencia", () => {
+    const { container } = render(<ContactSection />);
+    const section = container.querySelector("section")!;
+    expect(section).toHaveClass("min-h-[100svh]");
+    expect(section).toHaveClass("sm:min-h-[calc(100svh+0.5rem)]");
+    expect(section).toHaveClass("lg:min-h-[calc(100svh+1.5rem)]");
+    expect(section.className).toContain("py-20 sm:py-24 lg:py-28");
+  });
+
+  // Fase 2 (TDD): stretch-fill — flex + flex-1 para equilibrio vertical.
+  it("estira el contenido: flex en sección/contenedor y flex-1 en la grilla", () => {
+    const { container } = render(<ContactSection />);
+    const section = container.querySelector("section")!;
+    expect(section).toHaveClass("flex");
+    expect(section).toHaveClass("flex-col");
+    expect(section).not.toHaveClass("justify-center");
+
+    const inner = section.querySelector(":scope > div")!;
+    expect(inner).toHaveClass("flex-1");
+    expect(inner).toHaveClass("flex-col");
+
+    const grid = inner.querySelector(".grid")!;
+    expect(grid).toHaveClass("flex-1");
   });
 
   it("estructura en 2 columnas: intro (encabezado + reloj + enlaces) y panel (formulario)", () => {
@@ -252,5 +282,159 @@ describe("ContactSection — Motion System (Ajuste 8)", () => {
 
     expect(triggerReveal(panel)).toBe(true);
     expect(panel.classList.contains("is-visible")).toBe(true);
+  });
+});
+
+/**
+ * Escalado de resoluciones grandes (xl ≥1280 / 2xl ≥1536): las 4 cards
+ * de enlaces comparten una cadena de escala idéntica (uniformidad del
+ * Ajuste 17 extendida a 2xl) y el panel del formulario, los campos y el
+ * botón escalan con variantes 2xl: sin tocar las clases base.
+ */
+describe("ContactSection — Escala en resoluciones grandes (xl/2xl)", () => {
+  const CARD_IDS = [
+    "contact-card-whatsapp",
+    "contact-card-github",
+    "contact-card-email",
+    "contact-card-linkedin",
+  ] as const;
+
+  it("las 4 cards de enlaces comparten la misma cadena de escala 2xl (uniformidad)", () => {
+    render(<ContactSection />);
+    for (const id of CARD_IDS) {
+      const card = screen.getByTestId(id);
+
+      // Padding uniforme: base px-4 (Ajuste 17) + escala idéntica en 2xl
+      expect(card.className).toContain("px-4");
+      expect(card.className).toContain("2xl:px-5");
+      expect(card.className).toContain("2xl:py-4");
+
+      const grupo = card.children[0] as HTMLElement;
+      const iconBox = grupo.children[0] as HTMLElement;
+      expect(iconBox.className).toContain("h-8 w-8");
+      expect(iconBox.className).toContain("2xl:h-9 2xl:w-9");
+
+      const textos = iconBox.nextElementSibling as HTMLElement;
+      const titulo = textos.children[0] as HTMLElement;
+      const subtitulo = textos.children[1] as HTMLElement;
+      expect(titulo.className).toContain("text-xs");
+      expect(titulo.className).toContain("2xl:text-sm");
+      expect(subtitulo.className).toContain("text-[11px]");
+      expect(subtitulo.className).toContain("2xl:text-xs");
+    }
+  });
+
+  it("las flechas y los botones escalan 2xl:h-5 / 2xl:h-9 sobre base h-4/h-8", () => {
+    render(<ContactSection />);
+    for (const id of ["contact-card-whatsapp", "contact-card-github", "contact-card-linkedin"]) {
+      const card = screen.getByTestId(id);
+      const flecha = card.children[1] as SVGElement;
+      expect(flecha.getAttribute("class")).toContain("h-4 w-4");
+      expect(flecha.getAttribute("class")).toContain("2xl:h-5");
+    }
+
+    const email = screen.getByTestId("contact-card-email");
+    const botones = email.children[1] as HTMLElement;
+    expect(botones).toHaveClass("shrink-0");
+    for (const boton of botones.children) {
+      expect((boton as HTMLElement).className).toContain("h-8 w-8");
+      expect((boton as HTMLElement).className).toContain("2xl:h-9 2xl:w-9");
+    }
+  });
+
+  it("el panel del formulario escala 2xl:p-9 con glow reforzado en 2xl (base intacta)", () => {
+    render(<ContactSection />);
+    const panel = screen
+      .getByTestId("contact-panel")
+      .querySelector(":scope > .reveal-card")!;
+    expect(panel.className).toContain("sm:p-7");
+    expect(panel.className).toContain("2xl:p-9");
+    expect(panel.className).toContain("shadow-[0_0_50px_-10px_var(--glow-emerald)]");
+    expect(panel.className).toContain(
+      "2xl:shadow-[0_0_64px_-10px_var(--glow-emerald)]",
+    );
+  });
+
+  it("el micro-encabezado interior escala 2xl:text-xs y su caja 2xl:h-6", () => {
+    render(<ContactSection />);
+    const caja = screen.getByText("Envíame un mensaje").previousElementSibling!;
+    expect(caja.className).toContain("h-5 w-5");
+    expect(caja.className).toContain("2xl:h-6 2xl:w-6");
+
+    const texto = screen.getByText("Envíame un mensaje");
+    expect(texto.className).toContain("text-[11px]");
+    expect(texto.className).toContain("2xl:text-xs");
+  });
+
+  it("el label 'Enlaces directos' y la columna 1 escalan en 2xl", () => {
+    render(<ContactSection />);
+    const label = screen.getByText("Enlaces directos");
+    expect(label.className).toContain("text-[10px]");
+    expect(label.className).toContain("2xl:text-xs");
+
+    const intro = screen.getByTestId("contact-intro");
+    expect(intro.className).toContain("gap-6");
+    expect(intro.className).toContain("2xl:gap-7");
+  });
+
+  it("el Input escala 2xl:text-base/min-h-12 y su label 2xl:text-[0.9375rem]", () => {
+    render(<ContactSection />);
+    const input = screen.getByLabelText(/Nombre completo/i);
+    expect(input.className).toContain("min-h-11");
+    expect(input.className).toContain("text-sm");
+    expect(input.className).toContain("2xl:min-h-12");
+    expect(input.className).toContain("2xl:text-base");
+    expect(input.className).toContain("2xl:py-3");
+
+    const label = screen.getByText("Nombre completo");
+    expect(label.className).toContain("text-sm");
+    expect(label.className).toContain("2xl:text-[0.9375rem]");
+  });
+
+  it("el Textarea escala 2xl:min-h-40/text-base y su contador 2xl:text-sm", () => {
+    render(<ContactSection />);
+    const textarea = screen.getByLabelText("Mensaje");
+    expect(textarea.className).toContain("min-h-32");
+    expect(textarea.className).toContain("2xl:min-h-40");
+    expect(textarea.className).toContain("2xl:text-base");
+    expect(textarea.className).toContain("2xl:py-3");
+
+    const contador = screen.getByText("0 / 1000");
+    expect(contador.className).toContain("text-xs");
+    expect(contador.className).toContain("2xl:text-sm");
+  });
+
+  it("el Button de envío escala 2xl:min-h-12/px-6/text-base (base intacta)", () => {
+    render(<ContactSection />);
+    const button = screen.getByRole("button", { name: /Enviar Mensaje/i });
+    expect(button.className).toContain("min-h-11");
+    expect(button.className).toContain("px-5");
+    expect(button.className).toContain("text-sm");
+    expect(button.className).toContain("2xl:min-h-12");
+    expect(button.className).toContain("2xl:px-6");
+    expect(button.className).toContain("2xl:py-3");
+    expect(button.className).toContain("2xl:text-base");
+  });
+
+  it("el mensaje del servidor escala a 2xl:text-sm (vía envío simulado)", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, message: "Mensaje enviado con éxito" }),
+    } as Response);
+
+    const user = userEvent.setup();
+    render(<ContactSection />);
+    await user.type(screen.getByLabelText(/Nombre completo/i), "Alirio Hernández");
+    await user.type(screen.getByLabelText(/Correo electrónico/i), "alirio@ejemplo.com");
+    await user.type(screen.getByLabelText("Mensaje"), "Hola, quiero un sitio web nuevo.");
+    await user.click(screen.getByRole("button", { name: /Enviar Mensaje/i }));
+
+    const mensajes = await screen.findAllByText("Mensaje enviado con éxito");
+    const serverMessage = mensajes.find((el) => el.tagName === "P");
+    expect(serverMessage).toBeDefined();
+    expect(serverMessage!.className).toContain("text-xs");
+    expect(serverMessage!.className).toContain("2xl:text-sm");
+
+    fetchSpy.mockRestore();
   });
 });

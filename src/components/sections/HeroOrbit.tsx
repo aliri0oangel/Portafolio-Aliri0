@@ -45,7 +45,7 @@ const TRAILS: readonly OrbitTrailSpec[] = [
  * Sistema orbital interactivo (HeroOrbit) — estilo chiragchrg.netlify.app.
  *
  * Características:
- * - Proporciones de la referencia: contenedor 340→500 px, avatar ≈50 %,
+ * - Proporciones de la referencia: contenedor 340→680 px, avatar ≈50 %,
  *   4 anillos al 60/70/80/90 % sin riel base (solo arco conic enmascarado).
  * - Entrada elástica escalonada por pieza (stagger 0.15, spring con rebote)
  *   que degrada a opacidad simple con `prefers-reduced-motion`.
@@ -105,11 +105,11 @@ export function HeroOrbit() {
       variants={system}
       initial="hidden"
       animate={motionState}
-      className="hero-orbit relative flex aspect-square w-full max-w-[340px] md:max-w-[440px] lg:max-w-[500px] select-none items-center justify-center overflow-x-clip"
+      className="hero-orbit relative flex aspect-square w-full max-w-[340px] md:max-w-[440px] lg:max-w-[500px] xl:max-w-[600px] 2xl:max-w-[680px] select-none items-center justify-center overflow-x-clip"
     >
       {/* Resplandor ambiental de fondo (estático, sin animación propia) */}
       <div
-        className="pointer-events-none absolute h-64 w-64 md:h-72 md:w-72 lg:h-80 lg:w-80 rounded-full bg-accent-emerald/20 blur-3xl animate-pulse"
+        className="pointer-events-none absolute h-64 w-64 md:h-72 md:w-72 lg:h-80 lg:w-80 xl:h-96 xl:w-96 2xl:h-[26rem] 2xl:w-[26rem] rounded-full bg-accent-emerald/20 blur-3xl animate-pulse"
         aria-hidden="true"
       />
 
@@ -161,14 +161,14 @@ export function HeroOrbit() {
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") setIsPressed(false);
         }}
-        className="relative z-20 flex h-[180px] w-[180px] md:h-[220px] md:w-[220px] lg:h-[250px] lg:w-[250px] cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-emerald select-none"
+        className="relative z-20 flex h-[180px] w-[180px] md:h-[220px] md:w-[220px] lg:h-[250px] lg:w-[250px] xl:h-[280px] xl:w-[280px] 2xl:h-[320px] 2xl:w-[320px] cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-emerald select-none"
       >
         <div className="relative h-full w-full overflow-hidden rounded-full">
           <Image
             src="/avatar/avatar_alirio.webp"
             alt="Avatar de Alirio"
-            width={250}
-            height={250}
+            width={320}
+            height={320}
             priority
             className="h-full w-full object-cover rounded-full select-none pointer-events-none"
           />

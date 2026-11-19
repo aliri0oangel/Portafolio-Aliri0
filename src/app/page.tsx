@@ -1,6 +1,6 @@
 "use client";
 
-import { AmbientCanvas } from "@/components/canvas/AmbientCanvas";
+import dynamic from "next/dynamic";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
@@ -11,11 +11,22 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { useInitialHash } from "@/hooks/useInitialHash";
 
 /**
+ * Fase 5 (rendimiento): `AmbientCanvas` se carga con `next/dynamic`
+ * fuera del bundle inicial — es decorativo (partículas 2D) y no debe
+ * retrasar el LCP del hero. `ssr: false` porque solo aporta en browser.
+ */
+const AmbientCanvas = dynamic(
+  () =>
+    import("@/components/canvas/AmbientCanvas").then((m) => m.AmbientCanvas),
+  { ssr: false },
+);
+
+/**
  * Ensamblador principal del portafolio (SPA con SSG).
  *
  * Orden de capas:
  * 1. `AmbientCanvas` — fondo cinematográfico adaptativo (Tier 1/2) o
- *    gradido estático (Tier 3).
+ *    gradido estático (Tier 3). Cargado dinámicamente (Fase 5).
  * 2. `Topbar` — navegación fija con sección activa sincronizada.
  * 3. Secciones de contenido — Hero → Sobre Mí → Habilidades → Proyectos
  *    → Contacto, todas ancladas para el scroll suave.

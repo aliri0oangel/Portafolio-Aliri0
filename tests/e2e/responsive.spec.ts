@@ -1,9 +1,9 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
 
 /**
  * Tests E2E responsive (Fase 6).
  *
- * Se ejecutan en 7 viewports (320→1920) definidos en
+ * Se ejecutan en 8 viewports (320→2560) definidos en
  * playwright.config.ts. Valida: sin scroll horizontal,
  * grilla de habilidades correcta por breakpoint, y
  * navegación funcional.
@@ -111,7 +111,14 @@ test.describe("Smoke: funcionamiento básico", () => {
   test("la sección de contacto tiene formulario", async ({ page }) => {
     await page.goto("/");
     // Ajuste 8: la card del panel usa reveal (display:none hasta el IO).
+    // En viewports cortos (320×568) el panel queda fuera del primer
+    // pantallazo de la sección —y mide 0px hasta que el observer dispara—,
+    // así que lo traemos a la vista explícitamente con evaluate (funciona
+    // con elementos ocultos, a diferencia de scrollIntoViewIfNeeded).
     await page.locator("#contacto").scrollIntoViewIfNeeded();
+    await page
+      .locator("[data-testid=contact-panel]")
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
     await expect(page.locator("#contacto form")).toBeVisible();
   });
 });
@@ -126,7 +133,7 @@ test.describe("Smoke: funcionamiento básico", () => {
  * `min-w-0` no podía encogerse y el `truncate` del correo nunca
  * actuaba; los botones `shrink-0` escapaban de la card.
  *
- * Se ejecutan en los 7 viewports (320→1920) de playwright.config.ts.
+ * Se ejecutan en los 8 viewports (320→2560) de playwright.config.ts.
  */
 test.describe("Responsive: card de Email sin desborde (Ajuste 17)", () => {
   test.beforeEach(async ({ page }) => {
@@ -222,7 +229,7 @@ test.describe("Responsive: card de Email sin desborde (Ajuste 17)", () => {
    * ancho completo de la columna, y el padding vuelve a `px-4`
    * uniforme en las 4 cards.
    *
-   * Se ejecuta en los 7 viewports: valida que el texto nunca se
+   * Se ejecuta en los 8 viewports: valida que el texto nunca se
    * recorte y que el icono arrance a la misma distancia del borde
    * en las 4 cards.
    */
@@ -293,5 +300,103 @@ test.describe("Responsive: card de Email sin desborde (Ajuste 17)", () => {
     for (const h of heights) {
       expect(Math.abs(h - firstHeight)).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+/**
+ * Escalado de resoluciones grandes (xl ≥1280 / 2xl ≥1536) — patrón del
+ * Hero: solo variantes xl:/2xl:, sin breakpoints custom. Valida con
+ * `getComputedStyle` que la tipografía CALCULADA crece de verdad en los
+ * viewports desktop-1280 (xl), desktop-1920 y desktop-2560 (2xl).
+ *
+ * En viewports <1280 este describe se salta (la escala base queda
+ * cubierta por los describes anteriores).
+ */
+test.describe("Responsive: escalado xl/2xl (resoluciones grandes)", () => {
+  type Escala = {
+    h2: number;
+    h3About: number;
+    h3Skills: number;
+    labelSkill: number;
+    input: number;
+    descHero: number;
+    footer: number;
+    nav: number;
+  };
+
+  /** Expectativas por tier (px computados). */
+  const ESPERA_XL: Escala = {
+    h2: 44, // xl:text-[2.75rem]
+    h3About: 20, // xl:text-xl
+    h3Skills: 24, // base text-2xl (sin xl propio)
+    labelSkill: 11, // xl:text-[11px]
+    input: 14, // base text-sm (sin xl propio)
+    descHero: 16, // sm:text-base (xl solo cambia ancho)
+    footer: 12, // base text-xs
+    nav: 14, // base text-sm
+  };
+  const ESPERA_2XL: Escala = {
+    h2: 52, // 2xl:text-[3.25rem]
+    h3About: 24, // 2xl:text-2xl
+    h3Skills: 30, // 2xl:text-3xl
+    labelSkill: 12, // 2xl:text-xs
+    input: 16, // 2xl:text-base
+    descHero: 18, // 2xl:text-lg
+    footer: 14, // 2xl:text-sm
+    nav: 16, // 2xl:text-base
+  };
+
+  /** Mide los font-size computados de las piezas clave de la página. */
+  async function medir(page: Page): Promise<Escala> {
+    await page.goto("/");
+    const px = async (loc: Locator): Promise<number> =>
+      parseFloat(await loc.evaluate((el) => getComputedStyle(el).fontSize));
+
+    return {
+      h2: await px(page.locator("#sobre-mi h2").first()),
+      h3About: await px(page.locator("#sobre-mi h3").first()),
+      h3Skills: await px(page.locator("#habilidades h3").first()),
+      labelSkill: await px(page.locator("#habilidades a > span").first()),
+      input: await px(page.getByLabel(/Nombre completo/i)),
+      descHero: await px(page.locator("#inicio p").first()),
+      footer: await px(page.locator("footer span").first()),
+      nav: await px(
+        page
+          .getByRole("navigation", { name: "Navegación principal" })
+          .getByRole("link")
+          .first(),
+      ),
+    };
+  }
+
+  function expectEscalado(actual: Escala, esperado: Escala): void {
+    for (const key of Object.keys(esperado) as (keyof Escala)[]) {
+      expect(actual[key], `font-size de ${key}`).toBeCloseTo(esperado[key], 0);
+    }
+  }
+
+  async function expectSinScrollHorizontal(page: Page): Promise<void> {
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  }
+
+  test("en xl (1280px) la tipografía crece al escalado xl", async ({ page }) => {
+    test.skip(page.viewportSize()!.width !== 1280, "la escala xl se valida en 1280px");
+    expectEscalado(await medir(page), ESPERA_XL);
+    await expectSinScrollHorizontal(page);
+  });
+
+  test("en 2xl (1920px) la tipografía llega a la escala completa", async ({ page }) => {
+    test.skip(page.viewportSize()!.width !== 1920, "la escala 2xl se valida en 1920px");
+    expectEscalado(await medir(page), ESPERA_2XL);
+    await expectSinScrollHorizontal(page);
+  });
+
+  test("en 2xl (2560px) la escala completa es idéntica a 1920px", async ({ page }) => {
+    test.skip(page.viewportSize()!.width !== 2560, "la escala 2xl se valida en 2560px");
+    expectEscalado(await medir(page), ESPERA_2XL);
+    await expectSinScrollHorizontal(page);
   });
 });

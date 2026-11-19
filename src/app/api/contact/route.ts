@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { contactSchema } from "@/schemas/contactSchema";
-import { rateLimit } from "@/lib/rateLimiter";
+import { rateLimitAsync } from "@/lib/rateLimiter";
 import { createEmailProvider } from "@/lib/emailService";
 import { containsHeaderInjection, escapeHtmlEntities } from "@/lib/sanitize";
 import { logInfo, logWarn, logError } from "@/lib/logger";
@@ -18,20 +18,108 @@ function getClientIp(request: NextRequest): string {
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
+/** Límite máximo del cuerpo del request (32 KB — el form real es < 2 KB). */
+const MAX_BODY_BYTES = 32 * 1024;
+
+/**
+ * Verifica que la petición provenga del propio sitio (CSRF / A01).
+ *
+ * Reglas:
+ * - Si hay `Origin`: debe coincidir con el host de la petición
+ *   (o ser el siteUrl configurado). `Origin: null` se rechaza.
+ * - Si no hay Origin pero hay `Sec-Fetch-Site`: debe ser
+ *   `same-origin` o `none` (navegación directa).
+ * - Sin ambos headers (curl/scripts): se acepta — el rate limit
+ *   sigue aplicando. Los browsers siempre envían uno de los dos.
+ *
+ * @param request - Petición entrante.
+ * @returns `true` si el origen es aceptable.
+ */
+function isTrustedOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get("origin");
+  const site = request.headers.get("sec-fetch-site");
+
+  if (origin !== null) {
+    // `null` viene de sandboxed iframes o file:// — siempre sospechoso.
+    if (origin === "null" || origin.length === 0) return false;
+    try {
+      const originHost = new URL(origin).host;
+      const requestHost =
+        request.headers.get("host") ?? request.nextUrl.host;
+      if (originHost === requestHost) return true;
+      // También permite el siteUrl canónico (dominio de producción).
+      const configured = process.env.NEXT_PUBLIC_SITE_URL;
+      if (configured) {
+        if (new URL(configured).host === originHost) return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  if (site !== null) {
+    return site === "same-origin" || site === "none";
+  }
+
+  // Sin Origin ni Sec-Fetch-Site: request no-browser (rate limit aplica).
+  return true;
+}
+
+/**
+ * Extrae el límite de Content-Length declarado (si existe).
+ *
+ * @param request - Petición entrante.
+ * @returns bytes declarados o `null` si no hay header.
+ */
+function getContentLength(request: NextRequest): number | null {
+  const raw = request.headers.get("content-length");
+  if (raw === null) return null;
+  const n = Number.parseInt(raw, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
 /**
  * Endpoint seguro de contacto.
  *
  * Capas de defensa (OWASP Top 10):
- * - **A01**: solo se acepta `POST`; otros métodos reciben 405.
+ * - **A01**: solo se acepta `POST`; origin check CSRF + 405 en GET.
  * - **A03**: validación Zod estricta + escape de entidades HTML.
  * - **A04**: rate limiting por IP (3 envíos / 15 min) + honeypot.
+ * - **A05**: límite de Content-Length (413) + sin PII en logs.
  * - **A02**: el proveedor de correo vive en el servidor (sin claves en cliente).
  */
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
 
-  // --- A04: Rate limiting por IP ---
-  const limit = rateLimit(ip);
+  // --- A01: Origin check (CSRF) ---
+  if (!isTrustedOrigin(request)) {
+    logWarn({
+      event: "contact.origin_rejected",
+      message: "Request rechazado por origen no confiable",
+    });
+    return NextResponse.json<ContactResponse>(
+      { ok: false, message: "Origen no permitido." },
+      { status: 403 },
+    );
+  }
+
+  // --- A05: Límite de tamaño de cuerpo ---
+  const contentLength = getContentLength(request);
+  if (contentLength !== null && contentLength > MAX_BODY_BYTES) {
+    logWarn({
+      event: "contact.body_too_large",
+      message: "Cuerpo de petición excede el límite",
+      contentLength,
+    });
+    return NextResponse.json<ContactResponse>(
+      { ok: false, message: "Cuerpo de la petición demasiado grande." },
+      { status: 413 },
+    );
+  }
+
+  // --- A04: Rate limiting por IP (async: Upstash en serverless) ---
+  const limit = await rateLimitAsync(ip);
   if (!limit.allowed) {
     const retryAfterSeconds = Math.ceil(limit.retryAfterMs / 1000);
     // Telemetría: evento de rate limit (sin IP completa — solo longitud para debug)

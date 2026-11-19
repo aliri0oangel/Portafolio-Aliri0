@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { revealTargetCards } from "@/lib/sectionNav";
+import { scrollSectionIntoView } from "@/lib/sectionNav";
 
 /**
  * Hook para sincronizar el aterrizaje inicial de navegación cuando el usuario
@@ -17,11 +17,11 @@ import { revealTargetCards } from "@/lib/sectionNav";
  *
  * Solución:
  * Tras estabilizar el layout con un doble `requestAnimationFrame`, revela
- * preventivamente las tarjetas de la sección destino con `revealTargetCards(sección)`
- * y ejecuta `scrollIntoView({ behavior: "auto", block: "start" })` hacia su
- * `data-nav-anchor` (o a la sección directamente como fallback).
- *
- * El hash en la URL se mantiene intacto sin invocar `replaceState`.
+ * preventivamente las tarjetas de la sección destino y aterriza con
+ * `scrollSectionIntoView` (mismo camino que la nav: ancla a 88px o fin de
+ * sección alineado al viewport si el ancla dejaría asomar la siguiente —
+ * Fase 1). El hash en la URL se mantiene intacto sin invocar
+ * `replaceState`.
  */
 export function useInitialHash(): void {
   useEffect(() => {
@@ -39,10 +39,7 @@ export function useInitialHash(): void {
     let innerRaf = 0;
     const outerRaf = requestAnimationFrame(() => {
       innerRaf = requestAnimationFrame(() => {
-        revealTargetCards(section);
-        const anchor =
-          section.querySelector<HTMLElement>("[data-nav-anchor]") ?? section;
-        anchor.scrollIntoView({ behavior: "auto", block: "start" });
+        scrollSectionIntoView(section, "auto");
       });
     });
 

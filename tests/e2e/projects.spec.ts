@@ -181,7 +181,7 @@ test.describe("ProjectsSection: HUD Informativo y Demo Link", () => {
 });
 
 test.describe("ProjectsSection: Stage proporcional + footer compacto (Ajuste 13)", () => {
-  test("el stage es proporcional (≤1024px, centrado y 16/9 en lg), el footer ≤672px centrado y las flechas en el eje", async ({
+  test("el stage es proporcional (acotado por viewport, centrado y 16/9 en lg), el footer ≤672px centrado y las flechas en el eje", async ({
     page,
   }) => {
     await page.goto("/");
@@ -202,8 +202,12 @@ test.describe("ProjectsSection: Stage proporcional + footer compacto (Ajuste 13)
     const nextBox = (await next.boundingBox())!;
     const viewportWidth = page.viewportSize()!.width;
 
-    // 1) Stage acotado a max-w-5xl (1024px) en todos los viewports
-    expect(stageBox.width).toBeLessThanOrEqual(1024);
+    // 1) Stage acotado según el viewport: 1024px (max-w-5xl) por debajo
+    //    de xl, y hasta 1280/1536px en xl/2xl (el ancho real puede ser
+    //    menor si el alto disponible limita la proporción 16/9).
+    const stageCap =
+      viewportWidth >= 1536 ? 1536 : viewportWidth >= 1280 ? 1280 : 1024;
+    expect(stageBox.width).toBeLessThanOrEqual(stageCap);
 
     // 2) En lg (≥1024px) el stage adopta 16/9 ±4% en vez del 21/9 estirado
     if (viewportWidth >= 1024) {
@@ -212,7 +216,7 @@ test.describe("ProjectsSection: Stage proporcional + footer compacto (Ajuste 13)
       expect(ratio).toBeLessThanOrEqual(16 / 9 + 0.04);
     }
 
-    // 3) Cuando max-w-5xl manda (≥1280px), el stage queda centrado en la página
+    // 3) Cuando el stage toca su tope (≥1280px), queda centrado en la página
     if (viewportWidth >= 1280) {
       const docWidth = await page.evaluate(
         () => document.documentElement.clientWidth,

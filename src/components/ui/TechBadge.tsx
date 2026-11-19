@@ -28,6 +28,7 @@ export function TechBadge({ label, icon, version, className }: TechBadgeProps) {
       className={cn(
         "inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2 py-1",
         "text-xs font-medium text-text-dim",
+        "2xl:px-2.5 2xl:py-1.5 2xl:text-[13px]",
         className,
       )}
     >
